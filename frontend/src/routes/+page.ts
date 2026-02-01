@@ -5,7 +5,7 @@ export const ssr = false;
 
 export async function load({ fetch }) {
     try {
-        const res = await apiFetch("/api/info", {}, fetch);
+        const res = await apiFetch("/api/clients", {}, fetch);
         const data = await res.json();
         return { data };
     } catch (err) {
