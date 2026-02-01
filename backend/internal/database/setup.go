@@ -36,7 +36,7 @@ func seedAdmin() {
 		PasswordHash: string(hash),
 	})
 
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		log.Fatalln(err)
 	}
 }

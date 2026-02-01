@@ -1,6 +1,7 @@
 package main
 
 import (
+	"petsaway/internal/auth"
 	"petsaway/internal/database"
 	"petsaway/internal/server"
 
@@ -12,6 +13,9 @@ func main() {
 
 	// setup database
 	database.SetupDatabase()
+
+	// setup auth
+	auth.SetupAuth()
 
 	// setup server
 	server.SetupServer()
