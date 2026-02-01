@@ -7,7 +7,7 @@
     const table = new TableHandler([], { rowsPerPage: 20 });
 </script>
 
-<a href="/add" class="m-auto p-4 bg-blue-400 rounded-xl w-full">Add client</a>
+<a href="/add" class="m-10 p-4 bg-blue-400 rounded-xl w-full">Add client</a>
 <br />
 <br />
 <br />
