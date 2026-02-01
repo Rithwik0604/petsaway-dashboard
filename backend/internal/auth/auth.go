@@ -1,0 +1,70 @@
+package auth
+
+import (
+	"encoding/base64"
+	"log"
+	"os"
+	"petsaway/internal/database"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/securecookie"
+	"golang.org/x/crypto/bcrypt"
+)
+
+var SessionDuration = time.Hour * 24 * 30 // 1 month
+var s *securecookie.SecureCookie
+
+type Token struct {
+	UserId  string    `json:"user_id"`
+	Expires time.Time `json:"expires"`
+}
+
+func SetupAuth() {
+	secretStr := os.Getenv("SESSION_SECRET")
+	hashKey, err := base64.StdEncoding.DecodeString(secretStr)
+	if err != nil || len(hashKey) < 32 {
+		log.Fatal("Invalid SESSION_SECRET: must be 32-byte base64 string")
+	}
+	s = securecookie.New(hashKey, nil)
+}
+
+func InvalidateToken(c *gin.Context) {
+	c.SetCookie("token", "", -1, "/", "", false, true)
+}
+
+func CreateToken(userId string) (string, error) {
+	tokenData := Token{
+		UserId:  userId,
+		Expires: time.Now().Add(SessionDuration),
+	}
+
+	// Encode the struct into a signed string
+	return s.Encode("token", tokenData)
+}
+
+func TokenIsValid(cookieValue string) (string, bool) {
+	var decodedToken Token
+	err := s.Decode("token", cookieValue, &decodedToken)
+	if err != nil {
+		return "", false
+	}
+
+	// Check if the current time is after the expiration time
+	if time.Now().After(decodedToken.Expires) {
+		return "", false
+	}
+
+	return decodedToken.UserId, true
+}
+
+// Verifies user's password. Returns nil for success and an error for failure
+func VerifyPassword(username string, password string) error {
+	user, err := database.DB.GetUserByName(database.Qctx, username)
+	if err != nil {
+		return err
+	}
+
+	// if user found match passwords
+	return bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+}
