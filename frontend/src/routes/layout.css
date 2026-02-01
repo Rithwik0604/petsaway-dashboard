@@ -1,2 +1,7 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
+
+body {
+    min-width: 100dvw;
+    min-height: 100dvh;
+}
