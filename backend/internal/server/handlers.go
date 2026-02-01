@@ -11,8 +11,8 @@ import (
 
 func setupHandlers() {
 	// login
-	Router.POST("/auth/login", handleLogin)
-	Router.POST("/auth/logout", handleLogout)
+	Router.POST("/api/auth/login", handleLogin)
+	Router.POST("/api/auth/logout", handleLogout)
 
 	Router.Use(authMiddleware())
 	Router.GET("/api/clients", handleGetClients)
