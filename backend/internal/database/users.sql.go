@@ -32,7 +32,7 @@ func (q *Queries) GetUserByName(ctx context.Context, username string) (User, err
 }
 
 const insertUserByName = `-- name: InsertUserByName :one
-INSERT INTO
+INSERT OR IGNORE INTO
     users (id, username, password_hash)
 VALUES
     (?, ?, ?) RETURNING id, username, password_hash, created_at, updated_at

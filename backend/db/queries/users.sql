@@ -7,7 +7,7 @@ WHERE
     username = ?;
 
 -- name: InsertUserByName :one
-INSERT INTO
+INSERT OR IGNORE INTO
     users (id, username, password_hash)
 VALUES
     (?, ?, ?) RETURNING *;
