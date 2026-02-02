@@ -158,3 +158,8 @@ SET
     remarks = ?
 WHERE
     id = ? RETURNING *;
+
+-- name: DeleteClientById :exec
+DELETE FROM clients
+WHERE
+    id = ?;

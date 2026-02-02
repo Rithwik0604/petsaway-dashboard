@@ -108,6 +108,11 @@ func UpdateClient(id string, updates ClientDTO) (database.Client, error) {
 	return updatedClient, nil
 }
 
+func DeleteClient(id string) error {
+	err := database.DB.DeleteClientById(database.Qctx, id)
+	return err
+}
+
 // helpers
 
 func MapDTOToParams(dto any, params any) {
