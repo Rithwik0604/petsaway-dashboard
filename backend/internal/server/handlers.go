@@ -72,27 +72,58 @@ func handleGetClients(c *gin.Context) {
 
 func handleAddClient(c *gin.Context) {
 	// add client
-	// ...
+	var clientDetails clients.ClientDTO
 
-	c.JSON(http.StatusCreated, nil)
+	if err := c.ShouldBindJSON(&clientDetails); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	client, err := clients.AddClient(clientDetails)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusCreated, client)
 }
 
 func handleGetClientId(c *gin.Context) {
 	id := c.Param("id")
-	_ = id
 
 	// get client by ID
-	// ...
+	client, err := clients.GetClientById(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, client)
 }
 
 func handlePatchClient(c *gin.Context) {
 	id := c.Param("id")
-	_ = id
 
-	// get client and patch
-	// ...
+	var clientDetails clients.ClientDTO
 
-	c.JSON(http.StatusOK, nil)
+	if err := c.ShouldBindJSON(&clientDetails); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	client, err := clients.UpdateClient(id, clientDetails)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.AbortWithError(http.StatusNotFound, err)
+			return
+		}
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, client)
 }
