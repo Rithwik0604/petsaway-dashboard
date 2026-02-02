@@ -63,6 +63,10 @@
         }
     });
 
+    $effect(() => {
+        client.profit = client.quoted_amount - client.total_cost;
+    });
+
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         try {
@@ -79,25 +83,37 @@
             console.error(err);
         }
     }
+
+    async function handleDelete(event: MouseEvent) {
+        const answer = confirm("Are you sure you want to delete ?");
+        if (answer) {
+            try {
+                const res = await apiFetch(`/clients/${$page.params.id}`, { method: "DELETE" });
+                if (res.ok) goto("/");
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
 </script>
 
-<div class="container p-8 mx-auto max-w-6xl">
-    <div class="flex justify-between items-center mb-8">
+<div class="container max-w-6xl p-8 mx-auto">
+    <div class="flex items-center justify-between mb-8">
         <h1 class="text-3xl font-bold">Edit Client</h1>
         <button type="button" class="btn btn-ghost" onclick={() => goto("/")}>Cancel</button>
     </div>
 
     {#if client.client_name !== undefined}
-        <form onsubmit={handleSubmit} class="space-y-8 pb-20">
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <form onsubmit={handleSubmit} class="pb-20 space-y-8">
+            <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div class="md:col-span-1">
                     <h2 class="text-xl font-semibold">Client Identity</h2>
                     <p class="text-sm opacity-60">Primary contact and service type.</p>
                 </div>
-                <div class="md:col-span-2 shadow-xl card bg-base-100">
-                    <div class="card-body grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <label class="form-control w-full">
-                            <div class="label"><span class="label-text font-medium">Full Name</span></div>
+                <div class="shadow-xl md:col-span-2 card bg-base-100">
+                    <div class="grid grid-cols-1 gap-4 card-body sm:grid-cols-2">
+                        <label class="w-full form-control">
+                            <div class="label"><span class="font-medium label-text">Full Name</span></div>
                             <input
                                 type="text"
                                 required
@@ -105,13 +121,13 @@
                                 class="input input-bordered focus:input-primary"
                             />
                         </label>
-                        <label class="form-control w-full">
-                            <div class="label"><span class="label-text font-medium">Phone Number</span></div>
+                        <label class="w-full form-control">
+                            <div class="label"><span class="font-medium label-text">Phone Number</span></div>
                             <input type="text" bind:value={client.client_phone} class="input input-bordered" />
                         </label>
-                        <label class="form-control w-full">
+                        <label class="w-full form-control">
                             <div class="label">
-                                <span class="label-text font-medium text-secondary">Service Type</span>
+                                <span class="font-medium label-text text-secondary">Service Type</span>
                             </div>
                             <select
                                 bind:value={client.import_export}
@@ -127,35 +143,35 @@
 
             <hr class="opacity-10" />
 
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div class="md:col-span-1">
                     <h2 class="text-xl font-semibold">Pet Information</h2>
                     <p class="text-sm opacity-60">Specify pet details and age.</p>
                 </div>
-                <div class="md:col-span-2 shadow-xl card bg-base-100">
-                    <div class="card-body grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <label class="form-control w-full">
-                            <div class="label"><span class="label-text font-medium">Pet Name</span></div>
+                <div class="shadow-xl md:col-span-2 card bg-base-100">
+                    <div class="grid grid-cols-1 gap-4 card-body sm:grid-cols-2 lg:grid-cols-3">
+                        <label class="w-full form-control">
+                            <div class="label"><span class="font-medium label-text">Pet Name</span></div>
                             <input type="text" bind:value={client.pet_name} class="input input-bordered" />
                         </label>
-                        <label class="form-control w-full">
-                            <div class="label"><span class="label-text font-medium">Species</span></div>
+                        <label class="w-full form-control">
+                            <div class="label"><span class="font-medium label-text">Species</span></div>
                             <input type="text" bind:value={client.species} class="input input-bordered" />
                         </label>
-                        <label class="form-control w-full">
-                            <div class="label"><span class="label-text font-medium">Gender</span></div>
+                        <label class="w-full form-control">
+                            <div class="label"><span class="font-medium label-text">Gender</span></div>
                             <select bind:value={client.gender} class="select select-bordered">
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                             </select>
                         </label>
-                        <label class="form-control w-full">
-                            <div class="label"><span class="label-text font-medium">Breed</span></div>
+                        <label class="w-full form-control">
+                            <div class="label"><span class="font-medium label-text">Breed</span></div>
                             <input type="text" bind:value={client.breed} class="input input-bordered" />
                         </label>
-                        <label class="form-control w-full">
+                        <label class="w-full form-control">
                             <div class="label">
-                                <span class="label-text font-medium text-primary">Date of Birth</span>
+                                <span class="font-medium label-text text-primary">Date of Birth</span>
                             </div>
                             <input
                                 type="date"
@@ -164,8 +180,8 @@
                                 class="input input-bordered border-primary/30"
                             />
                         </label>
-                        <label class="form-control w-full">
-                            <div class="label"><span class="label-text font-medium">Microchip #</span></div>
+                        <label class="w-full form-control">
+                            <div class="label"><span class="font-medium label-text">Microchip #</span></div>
                             <input type="text" bind:value={client.microchip_number} class="input input-bordered" />
                         </label>
                     </div>
@@ -174,16 +190,16 @@
 
             <hr class="opacity-10" />
 
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div class="md:col-span-1">
                     <h2 class="text-xl font-semibold">Medical & Documentation</h2>
                     <p class="text-sm opacity-60">Vaccination history and check-list.</p>
                 </div>
-                <div class="md:col-span-2 shadow-xl card bg-base-100 border-l-4 border-success">
+                <div class="border-l-4 shadow-xl md:col-span-2 card bg-base-100 border-success">
                     <div class="card-body">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
                             <label class="form-control">
-                                <div class="label"><span class="label-text font-medium">Titre Date</span></div>
+                                <div class="label"><span class="font-medium label-text">Titre Date</span></div>
                                 <input
                                     type="date"
                                     bind:value={client.titre}
@@ -192,7 +208,7 @@
                                 />
                             </label>
                             <label class="form-control">
-                                <div class="label"><span class="label-text font-medium">Last Rabies Date</span></div>
+                                <div class="label"><span class="font-medium label-text">Last Rabies Date</span></div>
                                 <input
                                     type="date"
                                     bind:value={client.last_rabies_date}
@@ -202,7 +218,7 @@
                             </label>
                             <label class="form-control">
                                 <div class="label">
-                                    <span class="label-text font-medium text-success">Rabies Validity</span>
+                                    <span class="font-medium label-text text-success">Rabies Validity</span>
                                 </div>
                                 <input
                                     type="date"
@@ -213,7 +229,7 @@
                             </label>
                             <label class="form-control">
                                 <div class="label">
-                                    <span class="label-text font-medium">Other Vaccines Completed</span>
+                                    <span class="font-medium label-text">Other Vaccines Completed</span>
                                 </div>
                                 <input
                                     type="text"
@@ -224,7 +240,7 @@
                             </label>
                         </div>
 
-                        <div class="divider text-xs opacity-50 uppercase">Checklist</div>
+                        <div class="text-xs uppercase opacity-50 divider">Checklist</div>
 
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-4">
                             {#each [{ id: "documentation_status", label: "Docs Status" }, { id: "rabies_vaccination_valid", label: "Rabies Valid" }, { id: "health_certificate_issues", label: "Health Certificate" }, { id: "export_permit_approved", label: "Export Permit" }, { id: "import_permit_approved", label: "Import Permit" }, { id: "airline_approval_received", label: "Airline Approval" }, { id: "customs_clearance_done", label: "Customs Clear" }] as item}
@@ -234,7 +250,7 @@
                                         bind:checked={client[item.id]}
                                         class="checkbox checkbox-success checkbox-sm"
                                     />
-                                    <span class="label-text group-hover:text-success transition-colors"
+                                    <span class="transition-colors label-text group-hover:text-success"
                                         >{item.label}</span
                                     >
                                 </label>
@@ -246,42 +262,42 @@
 
             <hr class="opacity-10" />
 
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div class="md:col-span-1">
                     <h2 class="text-xl font-semibold">Travel Logistics</h2>
                     <p class="text-sm opacity-60">Origin, destination, and flight times.</p>
                 </div>
-                <div class="md:col-span-2 shadow-xl card bg-base-100">
-                    <div class="card-body grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="shadow-xl md:col-span-2 card bg-base-100">
+                    <div class="grid grid-cols-1 gap-4 card-body sm:grid-cols-2">
                         <label class="form-control">
-                            <div class="label"><span class="label-text font-medium">Origin Country</span></div>
+                            <div class="label"><span class="font-medium label-text">Origin Country</span></div>
                             <input type="text" bind:value={client.origin_country} class="input input-bordered" />
                         </label>
                         <label class="form-control">
-                            <div class="label"><span class="label-text font-medium">Destination Country</span></div>
+                            <div class="label"><span class="font-medium label-text">Destination Country</span></div>
                             <input type="text" bind:value={client.destination_country} class="input input-bordered" />
                         </label>
-                        <label class="form-control col-span-1 sm:col-span-2">
+                        <label class="col-span-1 form-control sm:col-span-2">
                             <div class="label">
-                                <span class="label-text font-medium text-warning">Departure Date & Time</span>
+                                <span class="font-medium label-text text-warning">Departure Date & Time</span>
                             </div>
                             <input
                                 type="datetime-local"
                                 bind:value={client.departure}
                                 onclick={(e) => e.currentTarget.showPicker()}
-                                class="input input-bordered border-warning/40 w-full"
+                                class="w-full input input-bordered border-warning/40"
                             />
                         </label>
                         <label class="form-control">
-                            <div class="label"><span class="label-text font-medium">Airline</span></div>
+                            <div class="label"><span class="font-medium label-text">Airline</span></div>
                             <input type="text" bind:value={client.airline} class="input input-bordered" />
                         </label>
                         <label class="form-control">
-                            <div class="label"><span class="label-text font-medium">Flight Number</span></div>
+                            <div class="label"><span class="font-medium label-text">Flight Number</span></div>
                             <input type="text" bind:value={client.flight_number} class="input input-bordered" />
                         </label>
                         <label class="form-control">
-                            <div class="label"><span class="label-text font-medium">Travel Type</span></div>
+                            <div class="label"><span class="font-medium label-text">Travel Type</span></div>
                             <input
                                 type="text"
                                 bind:value={client.type_of_travel}
@@ -289,9 +305,9 @@
                                 class="input input-bordered"
                             />
                         </label>
-                        <div class="grid grid-cols-2 gap-2 col-span-1 sm:col-span-2">
+                        <div class="grid grid-cols-2 col-span-1 gap-2 sm:col-span-2">
                             <label class="form-control">
-                                <div class="label"><span class="label-text font-medium">ETD</span></div>
+                                <div class="label"><span class="font-medium label-text">ETD</span></div>
                                 <input
                                     type="time"
                                     bind:value={client.etd}
@@ -300,7 +316,7 @@
                                 />
                             </label>
                             <label class="form-control">
-                                <div class="label"><span class="label-text font-medium">ETA</span></div>
+                                <div class="label"><span class="font-medium label-text">ETA</span></div>
                                 <input
                                     type="time"
                                     bind:value={client.eta}
@@ -315,37 +331,37 @@
 
             <hr class="opacity-10" />
 
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div class="md:col-span-1">
                     <h2 class="text-xl font-semibold">Financials & Remarks</h2>
                     <p class="text-sm opacity-60">Invoicing details and custom notes.</p>
                 </div>
-                <div class="md:col-span-2 shadow-xl card bg-base-100 border-t-4 border-info">
+                <div class="border-t-4 shadow-xl md:col-span-2 card bg-base-100 border-info">
                     <div class="card-body">
-                        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                        <div class="grid grid-cols-2 gap-4 mb-6 lg:grid-cols-3">
                             {#each [{ id: "import_fee", label: "Import Fee" }, { id: "export_fee", label: "Export Fee" }, { id: "after_hours_charges", label: "After Hours" }, { id: "forwarder_charges", label: "Forwarder" }, { id: "airline_charges", label: "Air Charges" }, { id: "crate_cost", label: "Crate Cost" }, { id: "quoted_amount", label: "Quoted" }, { id: "total_cost", label: "Total Cost" }, { id: "profit", label: "Profit" }, { id: "advanced_received", label: "Advanced" }, { id: "balance_pending", label: "Balance" }] as money}
                                 <label class="form-control">
                                     <div class="label">
-                                        <span class="label-text text-xs opacity-70 uppercase">{money.label}</span>
+                                        <span class="text-xs uppercase label-text opacity-70">{money.label}</span>
                                     </div>
                                     <div class="relative">
-                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 opacity-50">$</span>
+                                        <span class="absolute -translate-y-1/2 opacity-50 left-3 top-1/2">$</span>
                                         <input
                                             type="number"
                                             step="0.01"
                                             bind:value={client[money.id]}
-                                            class="input input-bordered w-full pl-7"
+                                            class="w-full input input-bordered pl-7"
                                         />
                                     </div>
                                 </label>
                             {/each}
                             <label class="form-control">
                                 <div class="label">
-                                    <span class="label-text font-bold text-info">Payment Status</span>
+                                    <span class="font-bold label-text text-info">Payment Status</span>
                                 </div>
                                 <select
                                     bind:value={client.payment_status}
-                                    class="select select-bordered font-bold border-info/40"
+                                    class="font-bold select select-bordered border-info/40"
                                 >
                                     <option value="pending">Pending</option>
                                     <option value="paid">Paid</option>
@@ -353,7 +369,7 @@
                             </label>
                         </div>
                         <label class="form-control">
-                            <div class="label"><span class="label-text font-medium">Remarks / Private Notes</span></div>
+                            <div class="label"><span class="font-medium label-text">Remarks / Private Notes</span></div>
                             <textarea
                                 bind:value={client.remarks}
                                 rows="3"
@@ -366,14 +382,14 @@
             </section>
 
             <div class="flex justify-end gap-4 mt-12">
-                <button type="button" class="btn btn-ghost px-8" onclick={() => goto("/")}>Discard</button>
-                <button type="submit" class="btn btn-primary px-12 text-lg shadow-lg">Save Changes</button>
+                <button type="button" class="px-8 btn btn-error" onclick={handleDelete}>DELETE</button>
+                <button type="submit" class="px-12 text-lg shadow-lg btn btn-primary">Save Changes</button>
             </div>
         </form>
     {:else}
-        <div class="flex flex-col justify-center items-center h-96 gap-4">
+        <div class="flex flex-col items-center justify-center gap-4 h-96">
             <span class="loading loading-spinner loading-lg text-primary"></span>
-            <p class="animate-pulse opacity-50">Loading client data...</p>
+            <p class="opacity-50 animate-pulse">Loading client data...</p>
         </div>
     {/if}
 </div>

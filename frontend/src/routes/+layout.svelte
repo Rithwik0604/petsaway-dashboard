@@ -1,13 +1,11 @@
 <script lang="ts">
-    import { apiFetch } from "$lib/api";
+    import { apiFetch, AUTHENTICATED } from "$lib/api";
     import favicon from "$lib/assets/favicon.svg";
     import { fly } from "svelte/transition";
     import { notifications } from "../lib/notifications.svelte";
     import "./layout.css";
 
     let { children } = $props();
-
-    let tokenExists = true;
 
     function logout() {
         apiFetch("/auth/logout", { method: "POST" });
@@ -25,7 +23,7 @@
         <div class="flex items-center justify-between py-4">
             <a href="/" class="text-2xl font-bold">PetsAway</a>
         </div>
-        {#if tokenExists}
+        {#if AUTHENTICATED}
             <div class="flex items-center justify-between p-2 py-4 bg-red-500 w-min h-min rounded-xl">
                 <button onclick={logout} class="cursor-pointer btn-error">Logout</button>
             </div>
