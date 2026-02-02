@@ -6,11 +6,9 @@ const config = {
     preprocess: vitePreprocess(),
     kit: {
         adapter: adapter({
-            pages: "build",
-            assets: "build",
-            fallback: "index.html", // Crucial for Single Page Apps (SPA)
-            precompress: false,
-            strict: true,
+            // fallback is essential for SPA mode
+            fallback: "index.html", // You can also use 'index.html'
+            strict: false,
         }),
     },
 };
