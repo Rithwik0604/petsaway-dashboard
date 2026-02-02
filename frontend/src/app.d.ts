@@ -7,7 +7,7 @@ declare global {
         // interface PageData {}
         // interface PageState {}
         // interface Platform {}
-        interface Client {
+        interface ClientData {
             id: string; // Assuming id is always present and valid
             client_name: { String: string; Valid: boolean };
             client_phone: { String: string; Valid: boolean };
@@ -52,6 +52,53 @@ declare global {
             remarks: { String: string; Valid: boolean };
             created_at: { Time: string; Valid: boolean };
             updated_at: { Time: string; Valid: boolean };
+        }
+
+        interface Client {
+            id: string; // Assuming id is always present and valid
+            client_name: string;
+            client_phone: string;
+            import_export: "import" | "export";
+            import_fee: number;
+            export_fee: number;
+            after_hours_charges: number;
+            pet_name: string;
+            species: string;
+            gender: "male" | "female";
+            breed: string;
+            date_of_birth: string;
+            microchip_number: string;
+            titre: string;
+            last_rabies_date: string;
+            rabies_validity: string;
+            documentation_status: number;
+            rabies_vaccination_valid: number;
+            other_vaccines_completed: string;
+            health_certificate_issues: number;
+            export_permit_approved: number;
+            import_permit_approved: number;
+            airline_approval_received: number;
+            customs_clearance_done: number;
+            origin_country: string;
+            destination_country: string;
+            forwarder_charges: number;
+            departure: string;
+            airline: string;
+            airline_charges: number;
+            crate_cost: number;
+            flight_number: string;
+            type_of_travel: string;
+            etd: string;
+            eta: string;
+            quoted_amount: number;
+            total_cost: number;
+            profit: number;
+            advanced_received: number;
+            balance_pending: number;
+            payment_status: "paid" | "pending";
+            remarks: string;
+            created_at: string;
+            updated_at: string;
         }
     }
 }

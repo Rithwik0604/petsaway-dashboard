@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { formatDate, formatTo12Hour } from "$lib/format";
+    import { formatClientData, formatDate, formatTo12Hour } from "$lib/format";
     import StatusToggle from "$lib/StatusToggle.svelte";
     import { check, Datatable, TableHandler, ThFilter, ThSort, type AdvancedFilterBuilder } from "@vincjo/datatables";
-    import { ArrowUp, Check, EditIcon, X } from "lucide-svelte";
+    import { ArrowUp, Check, EditIcon, X, Ban } from "lucide-svelte";
     import { _toggleCheck } from "./+page.js";
 
     let filtersVisibility = $state(true);
@@ -11,12 +11,12 @@
     let statusFilterExpanded = $state(true);
 
     const { data } = $props();
-    let clients = $derived(data.data as App.Client[]);
+    let clients = $state(formatClientData(data.data as App.ClientData[]));
     // svelte-ignore non_reactive_update
     let view: any,
-        paymentFilter: AdvancedFilterBuilder<App.Client>,
-        typeFilter: AdvancedFilterBuilder<App.Client>,
-        petFilter: AdvancedFilterBuilder<App.Client>;
+        paymentFilter: AdvancedFilterBuilder<App.ClientData>,
+        typeFilter: AdvancedFilterBuilder<App.ClientData>,
+        petFilter: AdvancedFilterBuilder<App.ClientData>;
     // svelte-ignore state_referenced_locally
     const table = new TableHandler(clients, { rowsPerPage: 100, selectBy: "id" });
 
@@ -75,13 +75,13 @@
 
         petFilter = table.createAdvancedFilter("species", check.isEqualTo);
         clients.forEach((row) => {
-            row.date_of_birth.Time = formatDate(row.date_of_birth.Time);
-            row.titre.Time = formatDate(row.titre.Time);
-            row.last_rabies_date.Time = formatDate(row.last_rabies_date.Time);
-            row.rabies_validity.Time = formatDate(row.rabies_validity.Time);
-            row.departure.Time = formatDate(row.departure.Time);
-            row.created_at.Time = formatDate(row.created_at.Time);
-            row.updated_at.Time = formatDate(row.updated_at.Time);
+            row.date_of_birth = formatDate(row.date_of_birth);
+            row.titre = formatDate(row.titre);
+            row.last_rabies_date = formatDate(row.last_rabies_date);
+            row.rabies_validity = formatDate(row.rabies_validity);
+            row.departure = formatDate(row.departure);
+            row.created_at = formatDate(row.created_at);
+            row.updated_at = formatDate(row.updated_at);
             row.etd = formatTo12Hour(row.etd);
             row.eta = formatTo12Hour(row.eta);
         });
@@ -89,7 +89,6 @@
 
     async function handleToggle(id: string, field: string, isChecked: boolean) {
         const body = { id, [field]: isChecked };
-        console.log(body);
         try {
             const res = await _toggleCheck(id, body);
             if (!res!.ok) {
@@ -98,22 +97,27 @@
 
             // 1. Find the specific client in the source array
             // We use data.data because 'clients' is derived from it.
-            const index = data.data.findIndex((c: App.Client) => c.id === id);
+            // const index = data.data.findIndex((c: App.ClientData) => c.id === id);
+            const index = clients.findIndex((c: App.Client) => c.id === id);
 
             if (index !== -1) {
                 // 2. Update the nested value
-                data.data[index][field].Int64 = isChecked ? 1 : 0;
+                // data.data[index][field].Int64 = isChecked ? 1 : 0;
+                clients[index][field] = isChecked ? 1 : 0;
 
                 // 3. TRIGGER REACTIVITY: Re-assign the array to itself
-                data.data = [...data.data];
+                // data.data = [...data.data];
+                cliens = [...clients];
 
                 // // 4. SYNC THE TABLE: Most datatable handlers need to be told the source changed
-                table.setRows(data.data);
+                table.setRows(clients);
             }
         } catch (err) {
             // Error handling already in _toggleCheck
         }
     }
+
+    const csv = $state(table.createCSV());
 </script>
 
 <div class="container p-0 mx-auto mt-5">
@@ -125,6 +129,7 @@
     {#if !clients}
         <h1>No clients</h1>
     {:else}
+        <button class="mb-2 btn btn-accent min-w-max" onclick={() => csv.download("clients.csv")}>Download as CSV</button>
         <div class="flex flex-row items-start gap-4">
             <div>
                 <button
@@ -395,103 +400,110 @@
                                             <a href={`/edit/${row.id}`}><EditIcon /></a>
                                         </div></td
                                     >
-                                    <td class="whitespace-nowrap">{row.client_name.String}</td>
-                                    <td class="whitespace-nowrap">{row.client_phone.String}</td>
-                                    <td class="whitespace-nowrap">{row.import_export.String}</td>
-                                    <td class="whitespace-nowrap">{row.import_fee.Float64}</td>
-                                    <td class="whitespace-nowrap">{row.export_fee.Float64}</td>
-                                    <td class="whitespace-nowrap">{row.after_hours_charges.Float64}</td>
-                                    <td class="whitespace-nowrap">{row.pet_name.String}</td>
-                                    <td class="whitespace-nowrap">{row.species.String}</td>
-                                    <td class="whitespace-nowrap">{row.gender.String}</td>
-                                    <td class="whitespace-nowrap">{row.breed.String}</td>
-                                    <td class="whitespace-nowrap">{row.date_of_birth.Time}</td>
-                                    <td class="whitespace-nowrap">{row.microchip_number.String}</td>
-                                    <td class="whitespace-nowrap">{row.titre.Time}</td>
-                                    <td class="whitespace-nowrap">{row.last_rabies_date.Time}</td>
-                                    <td class="whitespace-nowrap">{row.rabies_validity.Time}</td>
+                                    <td class="whitespace-nowrap">{row.client_name}</td>
+                                    <td class="whitespace-nowrap">{row.client_phone}</td>
+                                    <td class="whitespace-nowrap">{row.import_export}</td>
+                                    <td class="whitespace-nowrap">{row.import_fee}</td>
+                                    <td class="whitespace-nowrap">{row.export_fee}</td>
+                                    <td class="whitespace-nowrap">{row.after_hours_charges}</td>
+                                    <td class="whitespace-nowrap">{row.pet_name}</td>
+                                    <td class="whitespace-nowrap">{row.species}</td>
+                                    <td class="whitespace-nowrap">{row.gender}</td>
+                                    <td class="whitespace-nowrap">{row.breed}</td>
+                                    <td class="whitespace-nowrap">{row.date_of_birth}</td>
+                                    <td class="whitespace-nowrap">{row.microchip_number}</td>
+                                    <td class="whitespace-nowrap">{row.titre}</td>
+                                    <td class="whitespace-nowrap">{row.last_rabies_date}</td>
+                                    <td class="whitespace-nowrap">{row.rabies_validity}</td>
                                     <td class="text-center whitespace-nowrap">
                                         <StatusToggle
-                                            checked={row.documentation_status.Int64 === 1}
+                                            checked={row.documentation_status === 1}
                                             onchange={(val: boolean) =>
                                                 handleToggle(row.id, "documentation_status", val)}
                                         />
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <StatusToggle
-                                            checked={row.rabies_vaccination_valid.Int64 === 1}
+                                            checked={row.rabies_vaccination_valid === 1}
                                             onchange={(val: boolean) =>
                                                 handleToggle(row.id, "rabies_vaccination_valid", val)}
                                         />
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <StatusToggle
-                                            checked={row.other_vaccines_completed.Int64 === 1}
+                                            checked={row.other_vaccines_completed === 1}
                                             onchange={(val: boolean) =>
                                                 handleToggle(row.id, "other_vaccines_completed", val)}
                                         />
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <StatusToggle
-                                            checked={row.health_certificate_issues.Int64 === 1}
+                                            checked={row.health_certificate_issues === 1}
                                             onchange={(val: boolean) =>
                                                 handleToggle(row.id, "health_certificate_issues", val)}
                                         />
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <StatusToggle
-                                            checked={row.export_permit_approved.Int64 === 1}
+                                            checked={row.export_permit_approved === 1}
                                             onchange={(val: boolean) =>
                                                 handleToggle(row.id, "export_permit_approved", val)}
                                         />
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <StatusToggle
-                                            checked={row.import_permit_approved.Int64 === 1}
+                                            checked={row.import_permit_approved === 1}
                                             onchange={(val: boolean) =>
                                                 handleToggle(row.id, "import_permit_approved", val)}
                                         />
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <StatusToggle
-                                            checked={row.airline_approval_received.Int64 === 1}
+                                            checked={row.airline_approval_received === 1}
                                             onchange={(val: boolean) =>
                                                 handleToggle(row.id, "airline_approval_received", val)}
                                         />
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <StatusToggle
-                                            checked={row.customs_clearance_done.Int64 === 1}
+                                            checked={row.customs_clearance_done === 1}
                                             onchange={(val: boolean) =>
                                                 handleToggle(row.id, "customs_clearance_done", val)}
                                         />
                                     </td>
-                                    <td class="whitespace-nowrap">{row.origin_country.String}</td>
-                                    <td class="whitespace-nowrap">{row.destination_country.String}</td>
-                                    <td class="whitespace-nowrap">{row.forwarder_charges.Float64}</td>
-                                    <td class="whitespace-nowrap">{row.departure.Time}</td>
-                                    <td class="whitespace-nowrap">{row.airline.String}</td>
-                                    <td class="whitespace-nowrap">{row.airline_charges.Float64}</td>
-                                    <td class="whitespace-nowrap">{row.crate_cost.Float64}</td>
-                                    <td class="whitespace-nowrap">{row.flight_number.String}</td>
-                                    <td class="whitespace-nowrap">{row.type_of_travel.String}</td>
+                                    <td class="whitespace-nowrap">{row.origin_country}</td>
+                                    <td class="whitespace-nowrap">{row.destination_country}</td>
+                                    <td class="whitespace-nowrap">{row.forwarder_charges}</td>
+                                    <td class="whitespace-nowrap">{row.departure}</td>
+                                    <td class="whitespace-nowrap">{row.airline}</td>
+                                    <td class="whitespace-nowrap">{row.airline_charges}</td>
+                                    <td class="whitespace-nowrap">{row.crate_cost}</td>
+                                    <td class="whitespace-nowrap">{row.flight_number}</td>
+                                    <td class="whitespace-nowrap">{row.type_of_travel}</td>
                                     <td class="whitespace-nowrap">{row.etd}</td>
                                     <td class="whitespace-nowrap">{row.eta}</td>
-                                    <td class="whitespace-nowrap">{row.quoted_amount.Float64}</td>
-                                    <td class="whitespace-nowrap">{row.total_cost.Float64}</td>
-                                    <td class="whitespace-nowrap">{row.profit.Float64}</td>
-                                    <td class="whitespace-nowrap">{row.advanced_received.Float64}</td>
-                                    <td class="whitespace-nowrap">{row.balance_pending.Float64}</td>
-                                    <td
-                                        class="whitespace-nowrap"
-                                        class:text-emerald-500={row.payment_status.String === "paid"}
-                                        class:text-rose-500={row.payment_status.String === "pending"}
-                                    >
-                                        {row.payment_status.String}
+                                    <td class="whitespace-nowrap">{row.quoted_amount}</td>
+                                    <td class="whitespace-nowrap">{row.total_cost}</td>
+                                    <td class="whitespace-nowrap">{row.profit}</td>
+                                    <td class="whitespace-nowrap">{row.advanced_received}</td>
+                                    <td class="whitespace-nowrap">{row.balance_pending}</td>
+                                    <td class="whitespace-nowrap">
+                                        <span
+                                            class="badge"
+                                            class:badge-success={row.payment_status === "paid"}
+                                            class:badge-error={row.payment_status === "pending"}
+                                        >
+                                            {#if row.payment_status === "paid"}
+                                                <Check />
+                                            {:else}
+                                                <Ban />
+                                            {/if}
+                                            {row.payment_status}
+                                        </span>
                                     </td>
-                                    <td class="whitespace-nowrap">{row.remarks.String}</td>
-                                    <td class="whitespace-nowrap">{row.created_at.Time}</td>
-                                    <td class="whitespace-nowrap">{row.updated_at.Time}</td>
+                                    <td class="whitespace-nowrap">{row.remarks}</td>
+                                    <td class="whitespace-nowrap">{row.created_at}</td>
+                                    <td class="whitespace-nowrap">{row.updated_at}</td>
                                 </tr>
                             {/each}
                         </tbody>
