@@ -33,6 +33,10 @@ func InvalidateToken(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "", false, true)
 }
 
+func SetCookie(c *gin.Context, token string) {
+	c.SetCookie("token", token, int(SessionDuration), "/", "", false, true)
+}
+
 func CreateToken(userId string) (string, error) {
 	tokenData := Token{
 		UserId:  userId,
@@ -59,12 +63,12 @@ func TokenIsValid(cookieValue string) (string, bool) {
 }
 
 // Verifies user's password. Returns nil for success and an error for failure
-func VerifyPassword(username string, password string) error {
+func VerifyPassword(username string, password string) (database.User, error) {
 	user, err := database.DB.GetUserByName(database.Qctx, username)
 	if err != nil {
-		return err
+		return database.User{}, err
 	}
 
 	// if user found match passwords
-	return bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	return user, bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 }

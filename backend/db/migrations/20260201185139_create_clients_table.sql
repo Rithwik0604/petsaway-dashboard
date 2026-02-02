@@ -49,7 +49,7 @@ CREATE TABLE
     );
 
 CREATE TRIGGER update_client_timestamp AFTER
-UPDATE ON clients BEGIN
+UPDATE ON clients FOR EACH ROW WHEN NEW.updated_at <= OLD.updated_at BEGIN
 UPDATE clients
 SET
     updated_at = CURRENT_TIMESTAMP
