@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"petsaway/internal/database"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ import (
 
 var SessionDuration = time.Hour * 24 * 30 // 1 month
 var s *securecookie.SecureCookie
+var debugMode bool
 
 type Token struct {
 	UserId  string    `json:"user_id"`
@@ -27,10 +29,19 @@ func SetupAuth() {
 		log.Fatal("Invalid SESSION_SECRET: must be 32-byte base64 string")
 	}
 	s = securecookie.New(hashKey, nil)
+
+	debugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func InvalidateToken(c *gin.Context) {
-	c.SetCookie("token", "", -1, "/", "", false, true)
+	c.SetCookie("token", "", -1, "/", "", !debugMode, true)
+}
+
+func SetCookie(c *gin.Context, token string) {
+	c.SetCookie("token", token, int(SessionDuration), "/", "", !debugMode, true)
 }
 
 func SetCookie(c *gin.Context, token string) {
