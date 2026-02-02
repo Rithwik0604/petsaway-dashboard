@@ -111,7 +111,7 @@ func handlePatchClient(c *gin.Context) {
 	var clientDetails clients.ClientDTO
 
 	if err := c.ShouldBindJSON(&clientDetails); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 

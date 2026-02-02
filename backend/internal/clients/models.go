@@ -1,6 +1,7 @@
 package clients
 
 type ClientDTO struct {
+	Id                      *string  `json:"id"`
 	ClientName              *string  `json:"client_name"`
 	ClientPhone             *string  `json:"client_phone"`
 	ImportExport            *string  `json:"import_export"`
