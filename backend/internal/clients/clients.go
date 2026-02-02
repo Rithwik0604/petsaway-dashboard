@@ -2,6 +2,7 @@ package clients
 
 import (
 	"database/sql"
+	"fmt"
 	"petsaway/internal/database"
 	"reflect"
 	"time"
@@ -39,17 +40,68 @@ func GetClientById(id string) (database.Client, error) {
 }
 
 func UpdateClient(id string, updates ClientDTO) (database.Client, error) {
-	var params database.UpdateClientByIdParams
-
-	MapDTOToParams(&updates, &params)
-	params.ID = id
-
-	client, err := database.DB.UpdateClientById(database.Qctx, params)
+	// 1. Fetch the CURRENT data from the database
+	currentClient, err := database.DB.GetClientById(database.Qctx, id)
 	if err != nil {
 		return database.Client{}, err
 	}
 
-	return client, nil
+	// 2. Initialize params with EVERY current value from the DB
+	params := database.UpdateClientByIdParams{
+		ID:                      id,
+		ClientName:              currentClient.ClientName,
+		ClientPhone:             currentClient.ClientPhone,
+		ImportExport:            currentClient.ImportExport,
+		ImportFee:               currentClient.ImportFee,
+		ExportFee:               currentClient.ExportFee,
+		AfterHoursCharges:       currentClient.AfterHoursCharges,
+		PetName:                 currentClient.PetName,
+		Species:                 currentClient.Species,
+		Gender:                  currentClient.Gender,
+		Breed:                   currentClient.Breed,
+		DateOfBirth:             currentClient.DateOfBirth,
+		MicrochipNumber:         currentClient.MicrochipNumber,
+		Titre:                   currentClient.Titre,
+		LastRabiesDate:          currentClient.LastRabiesDate,
+		RabiesValidity:          currentClient.RabiesValidity,
+		DocumentationStatus:     currentClient.DocumentationStatus,
+		RabiesVaccinationValid:  currentClient.RabiesVaccinationValid,
+		OtherVaccinesCompleted:  currentClient.OtherVaccinesCompleted,
+		HealthCertificateIssues: currentClient.HealthCertificateIssues,
+		ExportPermitApproved:    currentClient.ExportPermitApproved,
+		ImportPermitApproved:    currentClient.ImportPermitApproved,
+		AirlineApprovalReceived: currentClient.AirlineApprovalReceived,
+		CustomsClearanceDone:    currentClient.CustomsClearanceDone,
+		OriginCountry:           currentClient.OriginCountry,
+		DestinationCountry:      currentClient.DestinationCountry,
+		ForwarderCharges:        currentClient.ForwarderCharges,
+		Departure:               currentClient.Departure,
+		Airline:                 currentClient.Airline,
+		AirlineCharges:          currentClient.AirlineCharges,
+		CrateCost:               currentClient.CrateCost,
+		FlightNumber:            currentClient.FlightNumber,
+		TypeOfTravel:            currentClient.TypeOfTravel,
+		Etd:                     currentClient.Etd,
+		Eta:                     currentClient.Eta,
+		QuotedAmount:            currentClient.QuotedAmount,
+		TotalCost:               currentClient.TotalCost,
+		Profit:                  currentClient.Profit,
+		AdvancedReceived:        currentClient.AdvancedReceived,
+		BalancePending:          currentClient.BalancePending,
+		PaymentStatus:           currentClient.PaymentStatus,
+		Remarks:                 currentClient.Remarks,
+	}
+
+	// 3. Overlay the updates from the DTO (Reflection only changes what was in JSON)
+	MapDTOToParams(&updates, &params)
+
+	// 4. Save the full record back (No data is lost because we filled 'params' with current data first)
+	updatedClient, err := database.DB.UpdateClientById(database.Qctx, params)
+	if err != nil {
+		return database.Client{}, err
+	}
+
+	return updatedClient, nil
 }
 
 // helpers
@@ -73,17 +125,28 @@ func MapDTOToParams(dto any, params any) {
 
 			switch v := val.Interface().(type) {
 			case string:
-				// 1. Check if target is NullTime
 				if targetType == reflect.TypeOf(sql.NullTime{}) {
 					if v == "" {
+						paramField.Set(reflect.ValueOf(sql.NullTime{Valid: false}))
 						continue
-					} // Skip empty date strings
-					t, err := time.Parse("2006-01-02", v) // Standard HTML date format
+					}
+
+					var t time.Time
+					var err error
+
+					// Try parsing as Datetime-local (ISO-ish) first
+					t, err = time.Parse("2006-01-02T15:04", v)
+					if err != nil {
+						// Fallback to standard Date format if the first fails
+						t, err = time.Parse("2006-01-02", v)
+					}
+
 					if err == nil {
 						paramField.Set(reflect.ValueOf(sql.NullTime{Time: t, Valid: true}))
+					} else {
+						// Log the error so you can see why parsing failed
+						fmt.Printf("Failed to parse date %s: %v\n", v, err)
 					}
-				} else if targetType == reflect.TypeOf(sql.NullString{}) {
-					paramField.Set(reflect.ValueOf(sql.NullString{String: v, Valid: true}))
 				}
 
 			case float64:
