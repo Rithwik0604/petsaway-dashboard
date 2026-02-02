@@ -95,6 +95,10 @@ func UpdateClient(id string, updates ClientDTO) (database.Client, error) {
 	// 3. Overlay the updates from the DTO (Reflection only changes what was in JSON)
 	MapDTOToParams(&updates, &params)
 
+	// if params.QuotedAmount.Valid && params.QuotedAmount.Float64 != 0 && params.TotalCost.Valid && params.TotalCost.Float64 != 0 {
+	// 	params.Profit.Float64 = params.QuotedAmount.Float64 - params.TotalCost.Float64
+	// }
+
 	// 4. Save the full record back (No data is lost because we filled 'params' with current data first)
 	updatedClient, err := database.DB.UpdateClientById(database.Qctx, params)
 	if err != nil {
@@ -102,6 +106,11 @@ func UpdateClient(id string, updates ClientDTO) (database.Client, error) {
 	}
 
 	return updatedClient, nil
+}
+
+func DeleteClient(id string) error {
+	err := database.DB.DeleteClientById(database.Qctx, id)
+	return err
 }
 
 // helpers
@@ -146,6 +155,19 @@ func MapDTOToParams(dto any, params any) {
 					} else {
 						// Log the error so you can see why parsing failed
 						fmt.Printf("Failed to parse date %s: %v\n", v, err)
+					}
+				} else if targetType == reflect.TypeOf(sql.NullString{}) {
+					if v == "" {
+						paramField.Set(reflect.ValueOf(sql.NullString{Valid: false}))
+					} else {
+						paramField.Set(reflect.ValueOf(sql.NullString{String: v, Valid: true}))
+					}
+				} else if targetType.Kind() == reflect.Interface {
+					// Handles ETD/ETA being generated as interface{}
+					if v == "" {
+						paramField.Set(reflect.Zero(targetType)) // Sets it to nil
+					} else {
+						paramField.Set(reflect.ValueOf(v)) // Sets it to the string "17:12"
 					}
 				}
 

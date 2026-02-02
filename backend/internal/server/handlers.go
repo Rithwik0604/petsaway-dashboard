@@ -18,8 +18,11 @@ func setupHandlers() {
 	Router.GET("/api/clients", handleGetClients)
 	Router.POST("/api/clients", handleAddClient)
 
-	Router.GET("/api/clients/:id", handleGetClientId)
-	Router.PATCH("/api/clients/:id", handlePatchClient)
+	const idRoute = "/api/clients/:id"
+
+	Router.GET(idRoute, handleGetClientId)
+	Router.PATCH(idRoute, handlePatchClient)
+	Router.DELETE(idRoute, handleDeleteClient)
 }
 
 func handleLogin(c *gin.Context) {
@@ -126,4 +129,20 @@ func handlePatchClient(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, client)
+}
+
+func handleDeleteClient(c *gin.Context) {
+	id := c.Param("id")
+
+	err := clients.DeleteClient(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.AbortWithError(http.StatusNotFound, err)
+			return
+		}
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }

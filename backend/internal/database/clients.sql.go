@@ -10,6 +10,17 @@ import (
 	"database/sql"
 )
 
+const deleteClientById = `-- name: DeleteClientById :exec
+DELETE FROM clients
+WHERE
+    id = ?
+`
+
+func (q *Queries) DeleteClientById(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, deleteClientById, id)
+	return err
+}
+
 const getAllClients = `-- name: GetAllClients :many
 SELECT
     id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at

@@ -44,10 +44,6 @@ func SetCookie(c *gin.Context, token string) {
 	c.SetCookie("token", token, int(SessionDuration), "/", "", !debugMode, true)
 }
 
-func SetCookie(c *gin.Context, token string) {
-	c.SetCookie("token", token, int(SessionDuration), "/", "", false, true)
-}
-
 func CreateToken(userId string) (string, error) {
 	tokenData := Token{
 		UserId:  userId,
