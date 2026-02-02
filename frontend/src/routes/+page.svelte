@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { formatDate } from "$lib/format";
+    import { formatDate, formatTo12Hour } from "$lib/format";
     import StatusToggle from "$lib/StatusToggle.svelte";
     import { check, Datatable, TableHandler, ThFilter, ThSort, type AdvancedFilterBuilder } from "@vincjo/datatables";
     import { ArrowUp, Check, EditIcon, X } from "lucide-svelte";
@@ -82,6 +82,8 @@
             row.departure.Time = formatDate(row.departure.Time);
             row.created_at.Time = formatDate(row.created_at.Time);
             row.updated_at.Time = formatDate(row.updated_at.Time);
+            row.etd = formatTo12Hour(row.etd);
+            row.eta = formatTo12Hour(row.eta);
         });
     }
 
@@ -506,32 +508,5 @@
         background-color: rgb(60, 60, 60) !important;
         /* If there is a "glow" caused by opacity or other effects: */
         --tw-bg-opacity: 0 !important;
-    }
-
-    /* Add icons inside the toggle handle */
-    .toggle-with-icons {
-        --tglbg: #f8fafc; /* Adjust handle color if needed */
-    }
-
-    /* Icon for the OFF state (X) */
-    .toggle-with-icons:not(:checked)::after {
-        content: "✕";
-        font-size: 0.7rem;
-        color: #ef4444; /* red-500 */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-    }
-
-    /* Icon for the ON state (Check) */
-    .toggle-with-icons:checked::after {
-        content: "✓";
-        font-size: 0.8rem;
-        color: #22c55e; /* green-500 */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
     }
 </style>

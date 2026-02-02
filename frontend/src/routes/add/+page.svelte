@@ -46,8 +46,15 @@
         remarks: "",
     });
 
+    $effect(() => {
+        client.profit = client.quoted_amount - client.total_cost;
+    });
+
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
+        if (client.quoted_amount > 0 && client.total_cost > 0) {
+            client.profit = client.quoted_amount - client.total_cost;
+        }
         try {
             console.log(client);
             const res = await apiFetch("/clients", { method: "POST", body: JSON.stringify(client) });
@@ -131,11 +138,7 @@
                         <div class="label">
                             <span class="label-text">Microchip Number</span>
                         </div>
-                        <input
-                            type="text"
-                            bind:value={client.microchip_number}
-                            class="w-full input input-bordered"
-                        />
+                        <input type="text" bind:value={client.microchip_number} class="w-full input input-bordered" />
                     </label>
                 </div>
             </div>
@@ -156,21 +159,13 @@
                         <div class="label">
                             <span class="label-text">Last Rabies Date</span>
                         </div>
-                        <input
-                            type="date"
-                            bind:value={client.last_rabies_date}
-                            class="w-full input input-bordered"
-                        />
+                        <input type="date" bind:value={client.last_rabies_date} class="w-full input input-bordered" />
                     </label>
                     <label class="w-full form-control">
                         <div class="label">
                             <span class="label-text">Rabies Validity</span>
                         </div>
-                        <input
-                            type="date"
-                            bind:value={client.rabies_validity}
-                            class="w-full input input-bordered"
-                        />
+                        <input type="date" bind:value={client.rabies_validity} class="w-full input input-bordered" />
                     </label>
                     <label class="w-full form-control">
                         <div class="label">
@@ -277,11 +272,7 @@
                         <div class="label">
                             <span class="label-text">Origin Country</span>
                         </div>
-                        <input
-                            type="text"
-                            bind:value={client.origin_country}
-                            class="w-full input input-bordered"
-                        />
+                        <input type="text" bind:value={client.origin_country} class="w-full input input-bordered" />
                     </label>
                     <label class="w-full form-control">
                         <div class="label">
@@ -313,11 +304,7 @@
                         <div class="label">
                             <span class="label-text">Flight Number</span>
                         </div>
-                        <input
-                            type="text"
-                            bind:value={client.flight_number}
-                            class="w-full input input-bordered"
-                        />
+                        <input type="text" bind:value={client.flight_number} class="w-full input input-bordered" />
                     </label>
                     <label class="w-full form-control">
                         <div class="label">
@@ -493,11 +480,7 @@
                     <div class="label">
                         <span class="label-text">Remarks</span>
                     </div>
-                    <textarea
-                        bind:value={client.remarks}
-                        rows="4"
-                        class="w-full textarea textarea-bordered"
-                    ></textarea>
+                    <textarea bind:value={client.remarks} rows="4" class="w-full textarea textarea-bordered"></textarea>
                 </label>
             </div>
         </div>

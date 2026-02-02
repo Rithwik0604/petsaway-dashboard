@@ -3,6 +3,8 @@ import { PUBLIC_API } from "$env/static/public";
 import { APIError } from "./errors";
 import { notifications } from "./notifications.svelte";
 
+export let AUTHENTICATED = false;
+
 // We pass in the fetch instance as an argument
 export async function apiFetch(
     endpoint: string,
@@ -13,11 +15,16 @@ export async function apiFetch(
     if (!res.ok) {
         const message = (await res.text()) || `API Error`;
         if (res.status == 401) {
+            AUTHENTICATED = false;
             goto("/login");
+            return new Response();
+        } else {
+            AUTHENTICATED = true;
+            const err = new APIError(message, res.status);
+            notifications.show(`API Error (${err.status}): ${err.message}`);
+            throw err;
         }
-        const err = new APIError(message, res.status);
-        notifications.show(`API Error (${err.status}): ${err.message}`);
-        throw err;
     }
+    AUTHENTICATED = true;
     return res;
 }
