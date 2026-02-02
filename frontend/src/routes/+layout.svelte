@@ -1,10 +1,9 @@
 <script lang="ts">
+    import { apiFetch } from "$lib/api";
     import favicon from "$lib/assets/favicon.svg";
     import { fly } from "svelte/transition";
     import { notifications } from "../lib/notifications.svelte";
     import "./layout.css";
-    import { apiFetch } from "$lib/api";
-    import { goto } from "$app/navigation";
 
     let { children } = $props();
 
