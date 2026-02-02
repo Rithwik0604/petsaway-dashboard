@@ -23,6 +23,7 @@
             breed: d.breed?.String ?? "",
             date_of_birth: formatDateForInput(d.date_of_birth?.Time),
             microchip_number: d.microchip_number?.String ?? "",
+            microchip_validity: formatDateForInput(d.microchip_validity?.Time),
             titre: formatDateForInput(d.titre?.Time),
             last_rabies_date: formatDateForInput(d.last_rabies_date?.Time),
             rabies_validity: formatDateForInput(d.rabies_validity?.Time),
@@ -183,6 +184,17 @@
                         <label class="w-full form-control">
                             <div class="label"><span class="font-medium label-text">Microchip #</span></div>
                             <input type="text" bind:value={client.microchip_number} class="input input-bordered" />
+                        </label>
+                        <label class="w-full form-control">
+                            <div class="label">
+                                <span class="font-medium label-text text-primary">Microchip Validity</span>
+                            </div>
+                            <input
+                                type="date"
+                                bind:value={client.microchip_validity}
+                                onclick={(e) => e.currentTarget.showPicker()}
+                                class="input input-bordered border-primary/30"
+                            />
                         </label>
                     </div>
                 </div>

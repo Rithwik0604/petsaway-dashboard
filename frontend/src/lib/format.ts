@@ -50,6 +50,9 @@ export function formatTo12Hour(timeStr: string): string {
 }
 
 export function formatClientData(data: App.ClientData[]): App.Client[] {
+    if (!data || data.length < 0) {
+        return [];
+    }
     return data.map((client) => ({
         id: client.id,
         client_name: client.client_name.Valid ? client.client_name.String : "",
@@ -64,6 +67,7 @@ export function formatClientData(data: App.ClientData[]): App.Client[] {
         breed: client.breed.Valid ? client.breed.String : "",
         date_of_birth: client.date_of_birth.Valid ? client.date_of_birth.Time : "",
         microchip_number: client.microchip_number.Valid ? client.microchip_number.String : "",
+        microchip_validity: client.microchip_validity.Valid ? client.microchip_validity.Time : "",
         titre: client.titre.Valid ? client.titre.Time : "",
         last_rabies_date: client.last_rabies_date.Valid ? client.last_rabies_date.Time : "",
         rabies_validity: client.rabies_validity.Valid ? client.rabies_validity.Time : "",

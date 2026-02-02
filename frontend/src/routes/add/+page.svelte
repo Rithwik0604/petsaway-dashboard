@@ -15,6 +15,7 @@
         breed: "",
         date_of_birth: "",
         microchip_number: "",
+        microchip_validity: "",
         titre: "",
         last_rabies_date: "",
         rabies_validity: "",
@@ -47,6 +48,18 @@
     });
 
     $effect(() => {
+        // formulas:
+        // 1. balance = quoted - advanced
+        client.balance_pending = client.quoted_amount - client.advanced_received;
+        // 2. total_cost = quoted - (import_fee + export_fee + after_hr + forwarded + airline_charges + crate_cost)
+        client.total_cost =
+            client.quoted_amount -
+            (client.import_fee +
+                client.export_fee +
+                client.after_hours_charges +
+                client.airline_charges +
+                client.crate_cost);
+        // 3. profit = quoted - total
         client.profit = client.quoted_amount - client.total_cost;
     });
 
@@ -148,6 +161,17 @@
                     <label class="w-full form-control">
                         <div class="label"><span class="font-medium label-text">Microchip #</span></div>
                         <input type="text" bind:value={client.microchip_number} class="input input-bordered" />
+                    </label>
+                    <label class="w-full form-control">
+                        <div class="label">
+                            <span class="font-medium label-text text-primary">Microchip Validity</span>
+                        </div>
+                        <input
+                            type="date"
+                            bind:value={client.microchip_validity}
+                            onclick={(e) => e.currentTarget.showPicker()}
+                            class="input input-bordered border-primary/30"
+                        />
                     </label>
                 </div>
             </div>
