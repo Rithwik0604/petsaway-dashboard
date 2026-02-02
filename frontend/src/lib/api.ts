@@ -1,6 +1,7 @@
 import { goto } from "$app/navigation";
 import { PUBLIC_API } from "$env/static/public";
 import { APIError } from "./errors";
+import { notifications } from "./notifications.svelte";
 
 // We pass in the fetch instance as an argument
 export async function apiFetch(
@@ -14,7 +15,9 @@ export async function apiFetch(
         if (res.status == 401) {
             goto("/login");
         }
-        throw new APIError(message, res.status);
+        const err = new APIError(message, res.status);
+        notifications.show(`API Error (${err.status}): ${err.message}`);
+        throw err;
     }
     return res;
 }

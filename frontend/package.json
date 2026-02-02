@@ -18,10 +18,14 @@
 		"@tailwindcss/forms": "^0.5.11",
 		"@tailwindcss/vite": "^4.1.18",
 		"@vincjo/datatables": "^2.8.0",
+		"daisyui": "^5.5.16",
 		"svelte": "^5.48.2",
 		"svelte-check": "^4.3.5",
 		"tailwindcss": "^4.1.18",
 		"typescript": "^5.9.3",
 		"vite": "^7.3.1"
+	},
+	"dependencies": {
+		"lucide-svelte": "^0.563.0"
 	}
 }

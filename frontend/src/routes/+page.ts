@@ -18,3 +18,16 @@ export async function load({ fetch }) {
         return;
     }
 }
+
+export async function _toggleCheck(id: string, body: object) {
+    try {
+        return await apiFetch(`/clients/${id}`, { method: "PATCH", body: JSON.stringify(body) });
+    } catch (err) {
+        if (err instanceof APIError) {
+            notifications.show(`API Error (${err.status}): ${err.message}`);
+        } else {
+            notifications.show(`Failed to connect to the API. ${err}`);
+        }
+        return;
+    }
+}

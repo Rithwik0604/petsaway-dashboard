@@ -1,56 +1,63 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { apiFetch } from "$lib/api";
+    import { page } from "$app/stores";
+    import { formatDateForInput, formatTimeForInput, formatDateTimeForInput } from "$lib/format";
+
+    const { data } = $props();
+    const clientData = data.data;
 
     let client = $state({
-        client_name: "",
-        client_phone: "",
-        import_export: "import",
-        import_fee: 0,
-        export_fee: 0,
-        after_hours_charges: 0,
-        pet_name: "",
-        species: "",
-        gender: "male",
-        breed: "",
-        date_of_birth: "",
-        microchip_number: "",
-        titre: "",
-        last_rabies_date: "",
-        rabies_validity: "",
-        documentation_status: false,
-        rabies_vaccination_valid: false,
-        other_vaccines_completed: "",
-        health_certificate_issues: false,
-        export_permit_approved: false,
-        import_permit_approved: false,
-        airline_approval_received: false,
-        customs_clearance_done: false,
-        origin_country: "",
-        destination_country: "",
-        forwarder_charges: 0,
-        departure: "",
-        airline: "",
-        airline_charges: 0,
-        crate_cost: 0,
-        flight_number: "",
-        type_of_travel: "",
-        etd: "",
-        eta: "",
-        quoted_amount: 0,
-        total_cost: 0,
-        profit: 0,
-        advanced_received: 0,
-        balance_pending: 0,
-        payment_status: "pending",
-        remarks: "",
+        client_name: clientData.client_name.String,
+        client_phone: clientData.client_phone.String,
+        import_export: clientData.import_export.String,
+        import_fee: clientData.import_fee.Float64,
+        export_fee: clientData.export_fee.Float64,
+        after_hours_charges: clientData.after_hours_charges.Float64,
+        pet_name: clientData.pet_name.String,
+        species: clientData.species.String,
+        gender: clientData.gender.String,
+        breed: clientData.breed.String,
+        date_of_birth: formatDateForInput(clientData.date_of_birth.Time),
+        microchip_number: clientData.microchip_number.String,
+        titre: formatDateForInput(clientData.titre.Time),
+        last_rabies_date: formatDateForInput(clientData.last_rabies_date.Time),
+        rabies_validity: formatDateForInput(clientData.rabies_validity.Time),
+        documentation_status: clientData.documentation_status.Int64 === 1,
+        rabies_vaccination_valid: clientData.rabies_vaccination_valid.Int64 === 1,
+        other_vaccines_completed: clientData.other_vaccines_completed.String,
+        health_certificate_issues: clientData.health_certificate_issues.Int64 === 1,
+        export_permit_approved: clientData.export_permit_approved.Int64 === 1,
+        import_permit_approved: clientData.import_permit_approved.Int64 === 1,
+        airline_approval_received: clientData.airline_approval_received.Int64 === 1,
+        customs_clearance_done: clientData.customs_clearance_done.Int64 === 1,
+        origin_country: clientData.origin_country.String,
+        destination_country: clientData.destination_country.String,
+        forwarder_charges: clientData.forwarder_charges.Float64,
+        departure: formatDateTimeForInput(clientData.departure.Time),
+        airline: clientData.airline.String,
+        airline_charges: clientData.airline_charges.Float64,
+        crate_cost: clientData.crate_cost.Float64,
+        flight_number: clientData.flight_number.String,
+        type_of_travel: clientData.type_of_travel.String,
+        etd: formatTimeForInput(clientData.etd),
+        eta: formatTimeForInput(clientData.eta),
+        quoted_amount: clientData.quoted_amount.Float64,
+        total_cost: clientData.total_cost.Float64,
+        profit: clientData.profit.Float64,
+        advanced_received: clientData.advanced_received.Float64,
+        balance_pending: clientData.balance_pending.Float64,
+        payment_status: clientData.payment_status.String,
+        remarks: clientData.remarks.String,
     });
 
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         try {
-            console.log(client);
-            const res = await apiFetch("/clients", { method: "POST", body: JSON.stringify(client) });
+            const res = await apiFetch(`/clients/${$page.params.id}`, {
+                method: "PATCH",
+                body: JSON.stringify(client),
+            });
             if (res.ok) {
                 goto("/");
             }
@@ -61,7 +68,7 @@
 </script>
 
 <div class="container p-8 mx-auto">
-    <h1 class="mb-6 text-3xl font-bold">Add New Client</h1>
+    <h1 class="mb-6 text-3xl font-bold">Edit Client</h1>
     <form onsubmit={handleSubmit} class="space-y-8">
         <!-- Client Details -->
         <div class="shadow-xl card bg-base-100">
@@ -503,7 +510,7 @@
         </div>
 
         <div class="flex justify-end">
-            <button type="submit" class="btn btn-primary"> Add Client </button>
+            <button type="submit" class="btn btn-primary"> Update Client </button>
         </div>
     </form>
 </div>
