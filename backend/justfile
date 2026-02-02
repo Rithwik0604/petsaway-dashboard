@@ -10,3 +10,6 @@ redo:
 
 gensql:
     sqlc generate
+
+buildprod:
+    GOOS=linux GOARCH=amd64 go build .
