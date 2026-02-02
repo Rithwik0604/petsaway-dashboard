@@ -53,6 +53,7 @@ type Client struct {
 	Remarks                 sql.NullString  `json:"remarks"`
 	CreatedAt               sql.NullTime    `json:"created_at"`
 	UpdatedAt               sql.NullTime    `json:"updated_at"`
+	MicrochipValidity       sql.NullTime    `json:"microchip_validity"`
 }
 
 type User struct {

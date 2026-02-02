@@ -36,6 +36,7 @@ INSERT INTO
         breed,
         date_of_birth,
         microchip_number,
+        microchip_validity,
         titre,
         last_rabies_date,
         rabies_validity,
@@ -109,6 +110,7 @@ VALUES
         ?,
         ?,
         ?,
+        ?,
         ?
     ) RETURNING *;
 
@@ -127,6 +129,7 @@ SET
     breed = ?,
     date_of_birth = ?,
     microchip_number = ?,
+    microchip_validity = ?,
     titre = ?,
     last_rabies_date = ?,
     rabies_validity = ?,

@@ -14,6 +14,7 @@ type ClientDTO struct {
 	Breed                   *string  `json:"breed"`
 	DateOfBirth             *string  `json:"date_of_birth"`
 	MicrochipNumber         *string  `json:"microchip_number"`
+	MicrochipValidity       *string  `json:"microchip_validity"`
 	Titre                   *string  `json:"titre"`
 	LastRabiesDate          *string  `json:"last_rabies_date"`
 	RabiesValidity          *string  `json:"rabies_validity"`
