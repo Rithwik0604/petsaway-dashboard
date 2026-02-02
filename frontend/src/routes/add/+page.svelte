@@ -52,441 +52,328 @@
 
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
-        if (client.quoted_amount > 0 && client.total_cost > 0) {
-            client.profit = client.quoted_amount - client.total_cost;
-        }
         try {
-            console.log(client);
-            const res = await apiFetch("/clients", { method: "POST", body: JSON.stringify(client) });
+            const res = await apiFetch("/clients", {
+                method: "POST",
+                body: JSON.stringify(client),
+            });
             if (res.ok) {
                 goto("/");
             }
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
 </script>
 
-<div class="container p-8 mx-auto">
-    <h1 class="mb-6 text-3xl font-bold">Add New Client</h1>
-    <form onsubmit={handleSubmit} class="space-y-8">
-        <!-- Client Details -->
-        <div class="shadow-xl card bg-base-100">
-            <div class="card-body">
-                <h2 class="card-title">Client Details</h2>
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+<div class="container max-w-6xl p-8 mx-auto">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold">Add New Client</h1>
+        <button type="button" class="btn btn-ghost" onclick={() => goto("/")}>Cancel</button>
+    </div>
+
+    <form onsubmit={handleSubmit} class="pb-20 space-y-8">
+        <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div class="md:col-span-1">
+                <h2 class="text-xl font-semibold">Client Identity</h2>
+                <p class="text-sm opacity-60">Primary contact and service type.</p>
+            </div>
+            <div class="shadow-xl md:col-span-2 card bg-base-100">
+                <div class="grid grid-cols-1 gap-4 card-body sm:grid-cols-2">
                     <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Client Name</span>
-                        </div>
+                        <div class="label"><span class="font-medium label-text">Full Name</span></div>
                         <input
                             type="text"
                             required
                             bind:value={client.client_name}
-                            class="w-full input input-bordered"
+                            class="input input-bordered focus:input-primary"
                         />
                     </label>
                     <label class="w-full form-control">
+                        <div class="label"><span class="font-medium label-text">Phone Number</span></div>
+                        <input type="text" bind:value={client.client_phone} class="input input-bordered" />
+                    </label>
+                    <label class="w-full form-control">
                         <div class="label">
-                            <span class="label-text">Client Phone</span>
+                            <span class="font-medium label-text text-secondary">Service Type</span>
                         </div>
-                        <input type="text" bind:value={client.client_phone} class="w-full input input-bordered" />
+                        <select bind:value={client.import_export} class="select select-bordered border-secondary/40">
+                            <option value="import">Import</option>
+                            <option value="export">Export</option>
+                        </select>
                     </label>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Pet Information -->
-        <div class="shadow-xl card bg-base-100">
-            <div class="card-body">
-                <h2 class="card-title">Pet Information</h2>
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <hr class="opacity-10" />
+
+        <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div class="md:col-span-1">
+                <h2 class="text-xl font-semibold">Pet Information</h2>
+                <p class="text-sm opacity-60">Specify pet details and age.</p>
+            </div>
+            <div class="shadow-xl md:col-span-2 card bg-base-100">
+                <div class="grid grid-cols-1 gap-4 card-body sm:grid-cols-2 lg:grid-cols-3">
                     <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Pet Name</span>
-                        </div>
-                        <input type="text" bind:value={client.pet_name} class="w-full input input-bordered" />
+                        <div class="label"><span class="font-medium label-text">Pet Name</span></div>
+                        <input type="text" bind:value={client.pet_name} class="input input-bordered" />
                     </label>
                     <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Species</span>
-                        </div>
-                        <input type="text" bind:value={client.species} class="w-full input input-bordered" />
+                        <div class="label"><span class="font-medium label-text">Species</span></div>
+                        <input type="text" bind:value={client.species} class="input input-bordered" />
                     </label>
                     <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Gender</span>
-                        </div>
-                        <select bind:value={client.gender} class="w-full select select-bordered">
+                        <div class="label"><span class="font-medium label-text">Gender</span></div>
+                        <select bind:value={client.gender} class="select select-bordered">
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                         </select>
                     </label>
                     <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Breed</span>
-                        </div>
-                        <input type="text" bind:value={client.breed} class="w-full input input-bordered" />
+                        <div class="label"><span class="font-medium label-text">Breed</span></div>
+                        <input type="text" bind:value={client.breed} class="input input-bordered" />
                     </label>
                     <label class="w-full form-control">
                         <div class="label">
-                            <span class="label-text">Date of Birth</span>
-                        </div>
-                        <input type="date" bind:value={client.date_of_birth} class="w-full input input-bordered" />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Microchip Number</span>
-                        </div>
-                        <input type="text" bind:value={client.microchip_number} class="w-full input input-bordered" />
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- Health & Documentation -->
-        <div class="shadow-xl card bg-base-100">
-            <div class="card-body">
-                <h2 class="card-title">Health & Documentation</h2>
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Titre Date</span>
-                        </div>
-                        <input type="date" bind:value={client.titre} class="w-full input input-bordered" />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Last Rabies Date</span>
-                        </div>
-                        <input type="date" bind:value={client.last_rabies_date} class="w-full input input-bordered" />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Rabies Validity</span>
-                        </div>
-                        <input type="date" bind:value={client.rabies_validity} class="w-full input input-bordered" />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Other Vaccines</span>
+                            <span class="font-medium label-text text-primary">Date of Birth</span>
                         </div>
                         <input
-                            type="text"
-                            bind:value={client.other_vaccines_completed}
-                            class="w-full input input-bordered"
-                            placeholder="e.g., DHPPI, Lepto"
-                        />
-                    </label>
-                </div>
-                <div class="grid grid-cols-2 gap-4 mt-6 md:grid-cols-3 lg:grid-cols-4">
-                    <div class="form-control">
-                        <label class="gap-2 cursor-pointer label">
-                            <span class="label-text">Documentation Complete</span>
-                            <input
-                                type="checkbox"
-                                bind:checked={client.documentation_status}
-                                class="checkbox checkbox-primary"
-                            />
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="gap-2 cursor-pointer label">
-                            <span class="label-text">Rabies Valid</span>
-                            <input
-                                type="checkbox"
-                                bind:checked={client.rabies_vaccination_valid}
-                                class="checkbox checkbox-primary"
-                            />
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="gap-2 cursor-pointer label">
-                            <span class="label-text">Health Certificate Issues</span>
-                            <input
-                                type="checkbox"
-                                bind:checked={client.health_certificate_issues}
-                                class="checkbox checkbox-primary"
-                            />
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="gap-2 cursor-pointer label">
-                            <span class="label-text">Export Permit Approved</span>
-                            <input
-                                type="checkbox"
-                                bind:checked={client.export_permit_approved}
-                                class="checkbox checkbox-primary"
-                            />
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="gap-2 cursor-pointer label">
-                            <span class="label-text">Import Permit Approved</span>
-                            <input
-                                type="checkbox"
-                                bind:checked={client.import_permit_approved}
-                                class="checkbox checkbox-primary"
-                            />
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="gap-2 cursor-pointer label">
-                            <span class="label-text">Airline Approval Received</span>
-                            <input
-                                type="checkbox"
-                                bind:checked={client.airline_approval_received}
-                                class="checkbox checkbox-primary"
-                            />
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="gap-2 cursor-pointer label">
-                            <span class="label-text">Customs Clearance Done</span>
-                            <input
-                                type="checkbox"
-                                bind:checked={client.customs_clearance_done}
-                                class="checkbox checkbox-primary"
-                            />
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Travel Details -->
-        <div class="shadow-xl card bg-base-100">
-            <div class="card-body">
-                <h2 class="card-title">Travel Details</h2>
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Type</span>
-                        </div>
-                        <select bind:value={client.import_export} class="w-full select select-bordered">
-                            <option value="import">Import</option>
-                            <option value="export">Export</option>
-                        </select>
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Origin Country</span>
-                        </div>
-                        <input type="text" bind:value={client.origin_country} class="w-full input input-bordered" />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Destination Country</span>
-                        </div>
-                        <input
-                            type="text"
-                            bind:value={client.destination_country}
-                            class="w-full input input-bordered"
+                            type="date"
+                            bind:value={client.date_of_birth}
+                            onclick={(e) => e.currentTarget.showPicker()}
+                            class="input input-bordered border-primary/30"
                         />
                     </label>
                     <label class="w-full form-control">
+                        <div class="label"><span class="font-medium label-text">Microchip #</span></div>
+                        <input type="text" bind:value={client.microchip_number} class="input input-bordered" />
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <hr class="opacity-10" />
+
+        <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div class="md:col-span-1">
+                <h2 class="text-xl font-semibold">Medical & Documentation</h2>
+                <p class="text-sm opacity-60">Vaccination history and check-list.</p>
+            </div>
+            <div class="border-l-4 shadow-xl md:col-span-2 card bg-base-100 border-success">
+                <div class="card-body">
+                    <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2">
+                        <label class="form-control">
+                            <div class="label"><span class="font-medium label-text">Titre Date</span></div>
+                            <input
+                                type="date"
+                                bind:value={client.titre}
+                                onclick={(e) => e.currentTarget.showPicker()}
+                                class="input input-bordered"
+                            />
+                        </label>
+                        <label class="form-control">
+                            <div class="label"><span class="font-medium label-text">Last Rabies Date</span></div>
+                            <input
+                                type="date"
+                                bind:value={client.last_rabies_date}
+                                onclick={(e) => e.currentTarget.showPicker()}
+                                class="input input-bordered"
+                            />
+                        </label>
+                        <label class="form-control">
+                            <div class="label">
+                                <span class="font-medium label-text text-success">Rabies Validity</span>
+                            </div>
+                            <input
+                                type="date"
+                                bind:value={client.rabies_validity}
+                                onclick={(e) => e.currentTarget.showPicker()}
+                                class="input input-bordered border-success/30"
+                            />
+                        </label>
+                        <label class="form-control">
+                            <div class="label">
+                                <span class="font-medium label-text">Other Vaccines Completed</span>
+                            </div>
+                            <input
+                                type="text"
+                                bind:value={client.other_vaccines_completed}
+                                class="input input-bordered"
+                                placeholder="e.g., DHPPI, Lepto"
+                            />
+                        </label>
+                    </div>
+
+                    <div class="text-xs uppercase opacity-50 divider">Checklist</div>
+
+                    <div class="grid grid-cols-2 gap-y-4 sm:grid-cols-3">
+                        {#each [{ id: "documentation_status", label: "Docs Status" }, { id: "rabies_vaccination_valid", label: "Rabies Valid" }, { id: "health_certificate_issues", label: "Health Certificate" }, { id: "export_permit_approved", label: "Export Permit" }, { id: "import_permit_approved", label: "Import Permit" }, { id: "airline_approval_received", label: "Airline Approval" }, { id: "customs_clearance_done", label: "Customs Clear" }] as item}
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    bind:checked={client[item.id]}
+                                    class="checkbox checkbox-success checkbox-sm"
+                                />
+                                <span class="transition-colors label-text group-hover:text-success">{item.label}</span>
+                            </label>
+                        {/each}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="opacity-10" />
+
+        <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div class="md:col-span-1">
+                <h2 class="text-xl font-semibold">Travel Logistics</h2>
+                <p class="text-sm opacity-60">Origin, destination, and flight times.</p>
+            </div>
+            <div class="shadow-xl md:col-span-2 card bg-base-100">
+                <div class="grid grid-cols-1 gap-4 card-body sm:grid-cols-2">
+                    <label class="form-control">
+                        <div class="label"><span class="font-medium label-text">Origin Country</span></div>
+                        <input type="text" bind:value={client.origin_country} class="input input-bordered" />
+                    </label>
+                    <label class="form-control">
+                        <div class="label"><span class="font-medium label-text">Destination Country</span></div>
+                        <input type="text" bind:value={client.destination_country} class="input input-bordered" />
+                    </label>
+                    <label class="col-span-1 form-control sm:col-span-2">
                         <div class="label">
-                            <span class="label-text">Departure Date/Time</span>
+                            <span class="font-medium label-text text-warning">Departure Date & Time</span>
                         </div>
                         <input
                             type="datetime-local"
                             bind:value={client.departure}
-                            class="w-full input input-bordered"
+                            onclick={(e) => e.currentTarget.showPicker()}
+                            class="w-full input input-bordered border-warning/40"
                         />
                     </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Airline</span>
-                        </div>
-                        <input type="text" bind:value={client.airline} class="w-full input input-bordered" />
+                    <label class="form-control">
+                        <div class="label"><span class="font-medium label-text">Airline</span></div>
+                        <input type="text" bind:value={client.airline} class="input input-bordered" />
                     </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Flight Number</span>
-                        </div>
-                        <input type="text" bind:value={client.flight_number} class="w-full input input-bordered" />
+                    <label class="form-control">
+                        <div class="label"><span class="font-medium label-text">Flight Number</span></div>
+                        <input type="text" bind:value={client.flight_number} class="input input-bordered" />
                     </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Type of Travel</span>
-                        </div>
+                    <label class="form-control">
+                        <div class="label"><span class="font-medium label-text">Travel Type</span></div>
                         <input
                             type="text"
                             bind:value={client.type_of_travel}
-                            class="w-full input input-bordered"
-                            placeholder="e.g., Cargo, Accompanied"
+                            placeholder="Cargo / Accompanied"
+                            class="input input-bordered"
                         />
                     </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">ETD</span>
-                        </div>
-                        <input type="time" bind:value={client.etd} class="w-full input input-bordered" />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">ETA</span>
-                        </div>
-                        <input type="time" bind:value={client.eta} class="w-full input input-bordered" />
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- Financials -->
-        <div class="shadow-xl card bg-base-100">
-            <div class="card-body">
-                <h2 class="card-title">Financials</h2>
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Import Fee</span>
-                        </div>
-                        <input
-                            type="number"
-                            step="0.01"
-                            bind:value={client.import_fee}
-                            class="w-full input input-bordered"
-                        />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Export Fee</span>
-                        </div>
-                        <input
-                            type="number"
-                            step="0.01"
-                            bind:value={client.export_fee}
-                            class="w-full input input-bordered"
-                        />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">After Hours Charges</span>
-                        </div>
-                        <input
-                            type="number"
-                            step="0.01"
-                            bind:value={client.after_hours_charges}
-                            class="w-full input input-bordered"
-                        />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Forwarder Charges</span>
-                        </div>
-                        <input
-                            type="number"
-                            step="0.01"
-                            bind:value={client.forwarder_charges}
-                            class="w-full input input-bordered"
-                        />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Airline Charges</span>
-                        </div>
-                        <input
-                            type="number"
-                            step="0.01"
-                            bind:value={client.airline_charges}
-                            class="w-full input input-bordered"
-                        />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Crate Cost</span>
-                        </div>
-                        <input
-                            type="number"
-                            step="0.01"
-                            bind:value={client.crate_cost}
-                            class="w-full input input-bordered"
-                        />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Quoted Amount</span>
-                        </div>
-                        <input
-                            type="number"
-                            step="0.01"
-                            bind:value={client.quoted_amount}
-                            class="w-full input input-bordered"
-                        />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Total Cost</span>
-                        </div>
-                        <input
-                            type="number"
-                            step="0.01"
-                            bind:value={client.total_cost}
-                            class="w-full input input-bordered"
-                        />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Profit</span>
-                        </div>
-                        <input
-                            type="number"
-                            step="0.01"
-                            bind:value={client.profit}
-                            class="w-full input input-bordered"
-                        />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Advanced Received</span>
-                        </div>
-                        <input
-                            type="number"
-                            step="0.01"
-                            bind:value={client.advanced_received}
-                            class="w-full input input-bordered"
-                        />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Balance Pending</span>
-                        </div>
-                        <input
-                            type="number"
-                            step="0.01"
-                            bind:value={client.balance_pending}
-                            class="w-full input input-bordered"
-                        />
-                    </label>
-                    <label class="w-full form-control">
-                        <div class="label">
-                            <span class="label-text">Payment Status</span>
-                        </div>
-                        <select bind:value={client.payment_status} class="w-full select select-bordered">
-                            <option value="pending">Pending</option>
-                            <option value="paid">Paid</option>
-                        </select>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- Remarks -->
-        <div class="shadow-xl card bg-base-100">
-            <div class="card-body">
-                <h2 class="card-title">Remarks</h2>
-                <label class="w-full form-control">
-                    <div class="label">
-                        <span class="label-text">Remarks</span>
+                    <div class="grid grid-cols-2 col-span-1 gap-2 sm:col-span-2">
+                        <label class="form-control">
+                            <div class="label"><span class="font-medium label-text">ETD</span></div>
+                            <input
+                                type="time"
+                                bind:value={client.etd}
+                                onclick={(e) => e.currentTarget.showPicker()}
+                                class="input input-bordered"
+                            />
+                        </label>
+                        <label class="form-control">
+                            <div class="label"><span class="font-medium label-text">ETA</span></div>
+                            <input
+                                type="time"
+                                bind:value={client.eta}
+                                onclick={(e) => e.currentTarget.showPicker()}
+                                class="input input-bordered"
+                            />
+                        </label>
                     </div>
-                    <textarea bind:value={client.remarks} rows="4" class="w-full textarea textarea-bordered"></textarea>
-                </label>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <div class="flex justify-end">
-            <button type="submit" class="btn btn-primary"> Add Client </button>
+        <hr class="opacity-10" />
+
+        <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div class="md:col-span-1">
+                <h2 class="text-xl font-semibold">Financials & Remarks</h2>
+                <p class="text-sm opacity-60">Invoicing details and custom notes.</p>
+            </div>
+            <div class="border-t-4 shadow-xl md:col-span-2 card bg-base-100 border-info">
+                <div class="card-body">
+                    <div class="grid grid-cols-2 gap-4 mb-6 lg:grid-cols-3">
+                        {#each [{ id: "import_fee", label: "Import Fee" }, { id: "export_fee", label: "Export Fee" }, { id: "after_hours_charges", label: "After Hours" }, { id: "forwarder_charges", label: "Forwarder" }, { id: "airline_charges", label: "Air Charges" }, { id: "crate_cost", label: "Crate Cost" }, { id: "quoted_amount", label: "Quoted" }, { id: "total_cost", label: "Total Cost" }, { id: "profit", label: "Profit" }, { id: "advanced_received", label: "Advanced" }, { id: "balance_pending", label: "Balance" }] as money}
+                            <label class="form-control">
+                                <div class="label">
+                                    <span class="text-xs uppercase label-text opacity-70">{money.label}</span>
+                                </div>
+                                <div class="relative">
+                                    <span class="absolute -translate-y-1/2 opacity-50 left-3 top-1/2">$</span>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        bind:value={client[money.id]}
+                                        class="w-full input input-bordered pl-7"
+                                    />
+                                </div>
+                            </label>
+                        {/each}
+                        <label class="form-control">
+                            <div class="label">
+                                <span class="font-bold label-text text-info">Payment Status</span>
+                            </div>
+                            <select
+                                bind:value={client.payment_status}
+                                class="font-bold select select-bordered border-info/40"
+                            >
+                                <option value="pending">Pending</option>
+                                <option value="paid">Paid</option>
+                            </select>
+                        </label>
+                    </div>
+                    <label class="form-control">
+                        <div class="label"><span class="font-medium label-text">Remarks / Private Notes</span></div>
+                        <textarea
+                            bind:value={client.remarks}
+                            rows="3"
+                            class="textarea textarea-bordered focus:textarea-info"
+                            placeholder="Any additional travel details..."
+                        ></textarea>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <div class="flex justify-end gap-4 mt-12">
+            <button type="submit" class="px-12 text-lg shadow-lg btn btn-primary">Create Client</button>
         </div>
     </form>
 </div>
+
+<style>
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%233b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>');
+        background-position: center;
+        background-size: contain;
+        width: 1.2rem;
+        height: 1.2rem;
+        cursor: pointer;
+    }
+
+    .container {
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

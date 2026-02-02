@@ -129,7 +129,9 @@
     {#if !clients}
         <h1>No clients</h1>
     {:else}
-        <button class="mb-2 btn btn-accent min-w-max" onclick={() => csv.download("clients.csv")}>Download as CSV</button>
+        <button class="mb-2 btn btn-accent min-w-max" onclick={() => csv.download("clients.csv")}
+            >Download as CSV</button
+        >
         <div class="flex flex-row items-start gap-4">
             <div>
                 <button
@@ -430,11 +432,7 @@
                                         />
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <StatusToggle
-                                            checked={row.other_vaccines_completed === 1}
-                                            onchange={(val: boolean) =>
-                                                handleToggle(row.id, "other_vaccines_completed", val)}
-                                        />
+                                        {row.other_vaccines_completed}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <StatusToggle

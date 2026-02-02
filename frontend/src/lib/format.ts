@@ -68,27 +68,13 @@ export function formatClientData(data: App.ClientData[]): App.Client[] {
         last_rabies_date: client.last_rabies_date.Valid ? client.last_rabies_date.Time : "",
         rabies_validity: client.rabies_validity.Valid ? client.rabies_validity.Time : "",
         documentation_status: client.documentation_status.Valid ? client.documentation_status.Int64 : 0,
-        rabies_vaccination_valid: client.rabies_vaccination_valid.Valid
-            ? client.rabies_vaccination_valid.Int64
-            : 0,
-        other_vaccines_completed: client.other_vaccines_completed.Valid
-            ? client.other_vaccines_completed.String
-            : "",
-        health_certificate_issues: client.health_certificate_issues.Valid
-            ? client.health_certificate_issues.Int64
-            : 0,
-        export_permit_approved: client.export_permit_approved.Valid
-            ? client.export_permit_approved.Int64
-            : 0,
-        import_permit_approved: client.import_permit_approved.Valid
-            ? client.import_permit_approved.Int64
-            : 0,
-        airline_approval_received: client.airline_approval_received.Valid
-            ? client.airline_approval_received.Int64
-            : 0,
-        customs_clearance_done: client.customs_clearance_done.Valid
-            ? client.customs_clearance_done.Int64
-            : 0,
+        rabies_vaccination_valid: client.rabies_vaccination_valid.Valid ? client.rabies_vaccination_valid.Int64 : 0,
+        other_vaccines_completed: client.other_vaccines_completed.Valid ? client.other_vaccines_completed.String : "",
+        health_certificate_issues: client.health_certificate_issues.Valid ? client.health_certificate_issues.Int64 : 0,
+        export_permit_approved: client.export_permit_approved.Valid ? client.export_permit_approved.Int64 : 0,
+        import_permit_approved: client.import_permit_approved.Valid ? client.import_permit_approved.Int64 : 0,
+        airline_approval_received: client.airline_approval_received.Valid ? client.airline_approval_received.Int64 : 0,
+        customs_clearance_done: client.customs_clearance_done.Valid ? client.customs_clearance_done.Int64 : 0,
         origin_country: client.origin_country.Valid ? client.origin_country.String : "",
         destination_country: client.destination_country.Valid ? client.destination_country.String : "",
         forwarder_charges: client.forwarder_charges.Valid ? client.forwarder_charges.Float64 : 0,
