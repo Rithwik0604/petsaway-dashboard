@@ -21,6 +21,7 @@ declare global {
             breed: { String: string; Valid: boolean };
             date_of_birth: { Time: string; Valid: boolean };
             microchip_number: { String: string; Valid: boolean };
+            microchip_validity: { Time: string; Valid: boolean };
             titre: { Time: string; Valid: boolean };
             last_rabies_date: { Time: string; Valid: boolean };
             rabies_validity: { Time: string; Valid: boolean };
@@ -68,6 +69,7 @@ declare global {
             breed: string;
             date_of_birth: string;
             microchip_number: string;
+            microchip_validity: string;
             titre: string;
             last_rabies_date: string;
             rabies_validity: string;

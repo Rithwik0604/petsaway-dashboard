@@ -1,0 +1,15 @@
+migrationsDir := "./db/migrations"
+dbFile := "./petsaway.db"
+
+[confirm("continue?")]
+gooseup:
+    goose -dir {{ migrationsDir }} sqlite3 {{ dbFile }} up
+
+redo:
+    goose -dir {{ migrationsDir }} sqlite3 {{ dbFile }} redo
+
+gensql:
+    sqlc generate
+
+buildprod:
+    GOOS=linux GOARCH=amd64 go build .

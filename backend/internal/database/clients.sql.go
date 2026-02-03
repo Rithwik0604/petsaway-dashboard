@@ -23,7 +23,7 @@ func (q *Queries) DeleteClientById(ctx context.Context, id string) error {
 
 const getAllClients = `-- name: GetAllClients :many
 SELECT
-    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at
+    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity
 FROM
     clients
 `
@@ -82,6 +82,7 @@ func (q *Queries) GetAllClients(ctx context.Context) ([]Client, error) {
 			&i.Remarks,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.MicrochipValidity,
 		); err != nil {
 			return nil, err
 		}
@@ -98,7 +99,7 @@ func (q *Queries) GetAllClients(ctx context.Context) ([]Client, error) {
 
 const getClientById = `-- name: GetClientById :one
 SELECT
-    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at
+    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity
 FROM
     clients
 WHERE
@@ -153,13 +154,14 @@ func (q *Queries) GetClientById(ctx context.Context, id string) (Client, error) 
 		&i.Remarks,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.MicrochipValidity,
 	)
 	return i, err
 }
 
 const getClientByName = `-- name: GetClientByName :many
 SELECT
-    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at
+    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity
 FROM
     clients
 WHERE
@@ -220,6 +222,7 @@ func (q *Queries) GetClientByName(ctx context.Context, clientName sql.NullString
 			&i.Remarks,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.MicrochipValidity,
 		); err != nil {
 			return nil, err
 		}
@@ -250,6 +253,7 @@ INSERT INTO
         breed,
         date_of_birth,
         microchip_number,
+        microchip_validity,
         titre,
         last_rabies_date,
         rabies_validity,
@@ -323,8 +327,9 @@ VALUES
         ?,
         ?,
         ?,
+        ?,
         ?
-    ) RETURNING id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at
+    ) RETURNING id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity
 `
 
 type InsertClientParams struct {
@@ -341,6 +346,7 @@ type InsertClientParams struct {
 	Breed                   sql.NullString  `json:"breed"`
 	DateOfBirth             sql.NullTime    `json:"date_of_birth"`
 	MicrochipNumber         sql.NullString  `json:"microchip_number"`
+	MicrochipValidity       sql.NullTime    `json:"microchip_validity"`
 	Titre                   sql.NullTime    `json:"titre"`
 	LastRabiesDate          sql.NullTime    `json:"last_rabies_date"`
 	RabiesValidity          sql.NullTime    `json:"rabies_validity"`
@@ -387,6 +393,7 @@ func (q *Queries) InsertClient(ctx context.Context, arg InsertClientParams) (Cli
 		arg.Breed,
 		arg.DateOfBirth,
 		arg.MicrochipNumber,
+		arg.MicrochipValidity,
 		arg.Titre,
 		arg.LastRabiesDate,
 		arg.RabiesValidity,
@@ -463,6 +470,7 @@ func (q *Queries) InsertClient(ctx context.Context, arg InsertClientParams) (Cli
 		&i.Remarks,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.MicrochipValidity,
 	)
 	return i, err
 }
@@ -482,6 +490,7 @@ SET
     breed = ?,
     date_of_birth = ?,
     microchip_number = ?,
+    microchip_validity = ?,
     titre = ?,
     last_rabies_date = ?,
     rabies_validity = ?,
@@ -512,7 +521,7 @@ SET
     payment_status = ?,
     remarks = ?
 WHERE
-    id = ? RETURNING id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at
+    id = ? RETURNING id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity
 `
 
 type UpdateClientByIdParams struct {
@@ -528,6 +537,7 @@ type UpdateClientByIdParams struct {
 	Breed                   sql.NullString  `json:"breed"`
 	DateOfBirth             sql.NullTime    `json:"date_of_birth"`
 	MicrochipNumber         sql.NullString  `json:"microchip_number"`
+	MicrochipValidity       sql.NullTime    `json:"microchip_validity"`
 	Titre                   sql.NullTime    `json:"titre"`
 	LastRabiesDate          sql.NullTime    `json:"last_rabies_date"`
 	RabiesValidity          sql.NullTime    `json:"rabies_validity"`
@@ -574,6 +584,7 @@ func (q *Queries) UpdateClientById(ctx context.Context, arg UpdateClientByIdPara
 		arg.Breed,
 		arg.DateOfBirth,
 		arg.MicrochipNumber,
+		arg.MicrochipValidity,
 		arg.Titre,
 		arg.LastRabiesDate,
 		arg.RabiesValidity,
@@ -651,6 +662,7 @@ func (q *Queries) UpdateClientById(ctx context.Context, arg UpdateClientByIdPara
 		&i.Remarks,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.MicrochipValidity,
 	)
 	return i, err
 }

@@ -61,6 +61,7 @@ func UpdateClient(id string, updates ClientDTO) (database.Client, error) {
 		Breed:                   currentClient.Breed,
 		DateOfBirth:             currentClient.DateOfBirth,
 		MicrochipNumber:         currentClient.MicrochipNumber,
+		MicrochipValidity:       currentClient.MicrochipValidity,
 		Titre:                   currentClient.Titre,
 		LastRabiesDate:          currentClient.LastRabiesDate,
 		RabiesValidity:          currentClient.RabiesValidity,

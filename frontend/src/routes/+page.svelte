@@ -76,6 +76,7 @@
         petFilter = table.createAdvancedFilter("species", check.isEqualTo);
         clients.forEach((row) => {
             row.date_of_birth = formatDate(row.date_of_birth);
+            row.microchip_validity = formatDate(row.microchip_validity);
             row.titre = formatDate(row.titre);
             row.last_rabies_date = formatDate(row.last_rabies_date);
             row.rabies_validity = formatDate(row.rabies_validity);
@@ -314,6 +315,7 @@
                                 <ThSort {table} field="breed">Breed</ThSort>
                                 <ThSort {table} field="date_of_birth">Date of Birth</ThSort>
                                 <ThSort {table} field="microchip_number">Microchip Number</ThSort>
+                                <ThSort {table} field="microchip_validity">Microchip Validity</ThSort>
                                 <ThSort {table} field="titre">Titre</ThSort>
                                 <ThSort {table} field="last_rabies_date">Last Rabies Date</ThSort>
                                 <ThSort {table} field="rabies_validity">Rabies Validity</ThSort>
@@ -360,6 +362,7 @@
                                 <ThFilter {table} field="breed" />
                                 <ThFilter {table} field="date_of_birth" />
                                 <ThFilter {table} field="microchip_number" />
+                                <ThFilter {table} field="microchip_validity" />
                                 <ThFilter {table} field="titre" />
                                 <ThFilter {table} field="last_rabies_date" />
                                 <ThFilter {table} field="rabies_validity" />
@@ -414,6 +417,7 @@
                                     <td class="whitespace-nowrap">{row.breed}</td>
                                     <td class="whitespace-nowrap">{row.date_of_birth}</td>
                                     <td class="whitespace-nowrap">{row.microchip_number}</td>
+                                    <td class="whitespace-nowrap">{row.microchip_validity}</td>
                                     <td class="whitespace-nowrap">{row.titre}</td>
                                     <td class="whitespace-nowrap">{row.last_rabies_date}</td>
                                     <td class="whitespace-nowrap">{row.rabies_validity}</td>
