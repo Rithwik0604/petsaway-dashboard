@@ -1,6 +1,9 @@
 migrationsDir := "./db/migrations"
 dbFile := "./petsaway.db"
 
+createmigration name:
+    goose -dir {{migrationsDir}} create {{name}} sql
+
 [confirm("continue?")]
 gooseup:
     goose -dir {{ migrationsDir }} sqlite3 {{ dbFile }} up
