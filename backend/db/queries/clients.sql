@@ -177,7 +177,8 @@ SELECT
 FROM
     clients
 WHERE
-    microchip_validity <= datetime ('now', '+7 days');
+    microchip_validity <= datetime ('now', '+7 days')
+    AND notification_microchip = 0;
 
 -- name: GetExpiringRabies :many
 SELECT
@@ -189,4 +190,19 @@ SELECT
 FROM
     clients
 WHERE
-    rabies_validity <= datetime ('now', '+7 days');
+    rabies_validity <= datetime ('now', '+7 days')
+    AND notification_rabies = 0;
+
+-- name: SetMicrochipNotified :exec
+UPDATE clients
+SET
+    notification_microchip = 1
+WHERE
+    id = ?;
+
+-- name: SetRabiesNotified :exec
+UPDATE clients
+SET
+    notification_rabies = 1
+WHERE
+    id = ?;

@@ -23,7 +23,7 @@ func (q *Queries) DeleteClientById(ctx context.Context, id string) error {
 
 const getAllClients = `-- name: GetAllClients :many
 SELECT
-    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity, notification
+    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity, notification_microchip, notification_rabies
 FROM
     clients
 `
@@ -83,7 +83,8 @@ func (q *Queries) GetAllClients(ctx context.Context) ([]Client, error) {
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.MicrochipValidity,
-			&i.Notification,
+			&i.NotificationMicrochip,
+			&i.NotificationRabies,
 		); err != nil {
 			return nil, err
 		}
@@ -100,7 +101,7 @@ func (q *Queries) GetAllClients(ctx context.Context) ([]Client, error) {
 
 const getClientById = `-- name: GetClientById :one
 SELECT
-    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity, notification
+    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity, notification_microchip, notification_rabies
 FROM
     clients
 WHERE
@@ -156,14 +157,15 @@ func (q *Queries) GetClientById(ctx context.Context, id string) (Client, error) 
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.MicrochipValidity,
-		&i.Notification,
+		&i.NotificationMicrochip,
+		&i.NotificationRabies,
 	)
 	return i, err
 }
 
 const getClientByName = `-- name: GetClientByName :many
 SELECT
-    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity, notification
+    id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity, notification_microchip, notification_rabies
 FROM
     clients
 WHERE
@@ -225,7 +227,8 @@ func (q *Queries) GetClientByName(ctx context.Context, clientName sql.NullString
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.MicrochipValidity,
-			&i.Notification,
+			&i.NotificationMicrochip,
+			&i.NotificationRabies,
 		); err != nil {
 			return nil, err
 		}
@@ -251,6 +254,7 @@ FROM
     clients
 WHERE
     microchip_validity <= datetime ('now', '+7 days')
+    AND notification_microchip = 0
 `
 
 type GetExpiringMicrochipRow struct {
@@ -301,6 +305,7 @@ FROM
     clients
 WHERE
     rabies_validity <= datetime ('now', '+7 days')
+    AND notification_rabies = 0
 `
 
 type GetExpiringRabiesRow struct {
@@ -432,7 +437,7 @@ VALUES
         ?,
         ?,
         ?
-    ) RETURNING id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity, notification
+    ) RETURNING id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity, notification_microchip, notification_rabies
 `
 
 type InsertClientParams struct {
@@ -574,9 +579,36 @@ func (q *Queries) InsertClient(ctx context.Context, arg InsertClientParams) (Cli
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.MicrochipValidity,
-		&i.Notification,
+		&i.NotificationMicrochip,
+		&i.NotificationRabies,
 	)
 	return i, err
+}
+
+const setMicrochipNotified = `-- name: SetMicrochipNotified :exec
+UPDATE clients
+SET
+    notification_microchip = 1
+WHERE
+    id = ?
+`
+
+func (q *Queries) SetMicrochipNotified(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, setMicrochipNotified, id)
+	return err
+}
+
+const setRabiesNotified = `-- name: SetRabiesNotified :exec
+UPDATE clients
+SET
+    notification_rabies = 1
+WHERE
+    id = ?
+`
+
+func (q *Queries) SetRabiesNotified(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, setRabiesNotified, id)
+	return err
 }
 
 const updateClientById = `-- name: UpdateClientById :one
@@ -625,7 +657,7 @@ SET
     payment_status = ?,
     remarks = ?
 WHERE
-    id = ? RETURNING id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity, notification
+    id = ? RETURNING id, client_name, client_phone, import_export, import_fee, export_fee, after_hours_charges, pet_name, species, gender, breed, date_of_birth, microchip_number, titre, last_rabies_date, rabies_validity, documentation_status, rabies_vaccination_valid, other_vaccines_completed, health_certificate_issues, export_permit_approved, import_permit_approved, airline_approval_received, customs_clearance_done, origin_country, destination_country, forwarder_charges, departure, airline, airline_charges, crate_cost, flight_number, type_of_travel, etd, eta, quoted_amount, total_cost, profit, advanced_received, balance_pending, payment_status, remarks, created_at, updated_at, microchip_validity, notification_microchip, notification_rabies
 `
 
 type UpdateClientByIdParams struct {
@@ -767,7 +799,8 @@ func (q *Queries) UpdateClientById(ctx context.Context, arg UpdateClientByIdPara
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.MicrochipValidity,
-		&i.Notification,
+		&i.NotificationMicrochip,
+		&i.NotificationRabies,
 	)
 	return i, err
 }
