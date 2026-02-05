@@ -54,6 +54,7 @@ type Client struct {
 	CreatedAt               sql.NullTime    `json:"created_at"`
 	UpdatedAt               sql.NullTime    `json:"updated_at"`
 	MicrochipValidity       sql.NullTime    `json:"microchip_validity"`
+	Notification            int64           `json:"notification"`
 }
 
 type User struct {
