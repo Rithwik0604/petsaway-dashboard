@@ -166,3 +166,43 @@ WHERE
 DELETE FROM clients
 WHERE
     id = ?;
+
+-- name: GetExpiringMicrochip :many
+SELECT
+    id,
+    client_name,
+    pet_name,
+    client_phone,
+    microchip_validity
+FROM
+    clients
+WHERE
+    microchip_validity <= datetime ('now', '+7 days')
+    AND notification_microchip = 0;
+
+-- name: GetExpiringRabies :many
+SELECT
+    id,
+    client_name,
+    pet_name,
+    client_phone,
+    rabies_validity
+FROM
+    clients
+WHERE
+    rabies_validity <= datetime ('now', '+7 days')
+    AND notification_rabies = 0;
+
+-- name: SetMicrochipNotified :exec
+UPDATE clients
+SET
+    notification_microchip = 1
+WHERE
+    id = ?;
+
+-- name: SetRabiesNotified :exec
+UPDATE clients
+SET
+    notification_rabies = 1
+WHERE
+    id = ?;
