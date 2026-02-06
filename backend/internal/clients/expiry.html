@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+    <body style="font-family: &quot;Segoe UI&quot;, Tahoma, Geneva, Verdana, sans-serif; color: #333; line-height: 1.6">
+        <div style="max-width: 700px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 10px">
+            <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px">
+                Reminder: {{.ExpiryType}} Validity Expiring
+            </h2>
+            <p>Hello <strong>{{ .Username }}</strong>,</p>
+            <p>
+                This is a friendly notification that the following pets have <strong>{{.ExpiryType}}</strong> validity
+                reaching expiration.
+            </p>
+
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0">
+                <thead>
+                    <tr style="background-color: #3498db; color: white">
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left">ID</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left">Pet Name</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left">Phone</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left">Expiry Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Items}}
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd">{{.ID}}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd">{{.PetName}}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd">{{.Phone}}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; color: #e74c3c; font-weight: bold">
+                            {{.Date}}
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+
+            <p style="font-size: 12px; color: #7f8c8d; margin-top: 40px; border-top: 1px solid #eee; padding-top: 10px">
+                This is an automated message from Your Server. Please do not reply directly to this email.
+            </p>
+        </div>
+    </body>
+</html>

@@ -3,11 +3,23 @@ package clients
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
 	"petsaway/internal/database"
 	"reflect"
 	"time"
 
 	"github.com/google/uuid"
+)
+
+var (
+	MailServer  string
+	TargetEmail string
+	Username    string
+	SmtpServer  string
+	SmtpPort    string
+	SmtpUser    string
+	SmtpPass    string
 )
 
 func GetAllClients() ([]database.Client, error) {
@@ -112,6 +124,123 @@ func UpdateClient(id string, updates ClientDTO) (database.Client, error) {
 func DeleteClient(id string) error {
 	err := database.DB.DeleteClientById(database.Qctx, id)
 	return err
+}
+
+// EMAILS ----------------
+
+func getExpiringMicrochip() ([]database.GetExpiringMicrochipRow, error) {
+	clients, err := database.DB.GetExpiringMicrochip(database.Qctx)
+	if err != nil {
+		return []database.GetExpiringMicrochipRow{}, err
+	}
+	return clients, nil
+}
+
+func getExpiringRabies() ([]database.GetExpiringRabiesRow, error) {
+	clients, err := database.DB.GetExpiringRabies(database.Qctx)
+	if err != nil {
+		return []database.GetExpiringRabiesRow{}, err
+	}
+	return clients, nil
+}
+
+func setMicrochipNotified(id string) error {
+	err := database.DB.SetMicrochipNotified(database.Qctx, id)
+	return err
+}
+
+func setRabiesNotified(id string) error {
+	err := database.DB.SetRabiesNotified(database.Qctx, id)
+	return err
+}
+
+func SetupEnvVars() {
+	MailServer = os.Getenv("MAILSERVER")
+	TargetEmail = os.Getenv("TARGETEMAIL")
+	Username = os.Getenv("USERNAME")
+	SmtpServer = os.Getenv("SMTPHOST")
+	SmtpPort = os.Getenv("SMTPPORT")
+	SmtpUser = os.Getenv("SMTPUSER")
+	SmtpPass = os.Getenv("SMTPPASS")
+}
+
+func RunExpirationCheck() {
+	log.Println("Running expiration check...")
+
+	// get microchip expirations
+	microchipExpirations, err := getExpiringMicrochip()
+	if err != nil {
+		log.Println("Error getting microchip expirations:", err.Error())
+		microchipExpirations = nil
+	}
+
+	// get rabies expirations
+	rabiesExpirations, err := getExpiringRabies()
+	if err != nil {
+		log.Println("Error getting rabies expirations:", err.Error())
+		rabiesExpirations = nil
+	}
+
+	if microchipExpirations != nil {
+		petEntry := []PetEntry{}
+		length := len(microchipExpirations)
+		for _, v := range microchipExpirations {
+			petEntry = append(petEntry, PetEntry{
+				ID:      v.ID,
+				PetName: v.ClientName.String,
+				Phone:   v.ClientPhone.String,
+				Date:    v.MicrochipValidity.Time.String(),
+			})
+		}
+		err := sendGroupedEmail(TargetEmail, EmailData{
+			Username:   Username,
+			ExpiryType: "Microchip",
+			Items:      petEntry,
+		})
+		if err != nil {
+			log.Println("Error sending microchip email: ", err.Error())
+		} else {
+			log.Printf("Sent %d Microchip Emails\n", length)
+			for _, v := range microchipExpirations {
+				if err := setMicrochipNotified(v.ID); err != nil {
+					log.Println("Error setting microchip validity notified. Id: ", v.ID)
+				}
+			}
+		}
+	}
+
+	if rabiesExpirations != nil {
+		petEntry := []PetEntry{}
+		length := len(rabiesExpirations)
+		for _, v := range rabiesExpirations {
+			petEntry = append(petEntry, PetEntry{
+				ID:      v.ID,
+				PetName: v.ClientName.String,
+				Phone:   v.ClientPhone.String,
+				Date:    v.RabiesValidity.Time.String(),
+			})
+		}
+		err := sendGroupedEmail(TargetEmail, EmailData{
+			Username:   Username,
+			ExpiryType: "Rabies",
+			Items:      petEntry,
+		})
+		if err != nil {
+			log.Println("Error sending rabies email: ", err.Error())
+		} else {
+			log.Printf("Sent %d Rabies Emails\n", length)
+
+			for _, v := range rabiesExpirations {
+				if err := setRabiesNotified(v.ID); err != nil {
+					log.Println("Error setting rabies validity notified. Id: ", v.ID)
+				}
+			}
+		}
+	}
+
+	if microchipExpirations == nil && rabiesExpirations == nil {
+		log.Println("No expiration emails to send")
+	}
 }
 
 // helpers
