@@ -64,22 +64,21 @@
         }
     });
 
-    $effect(() => {
-        // formulas:
-        // 1. balance = quoted - advanced
-        client.balance_pending = client.quoted_amount - client.advanced_received;
-        // 2. total_cost = import_fee + export_fee + after_hr + forwarded + airline_charges + crate_cost
+    /**
+     * Manual Trigger for Financials
+     */
+    function runCalculations() {
         client.total_cost =
-            client.import_fee +
-            client.export_fee +
-            client.forwarder_charges +
-            client.after_hours_charges +
-            client.airline_charges +
-            client.crate_cost;
+            Number(client.import_fee) +
+            Number(client.export_fee) +
+            Number(client.forwarder_charges) +
+            Number(client.after_hours_charges) +
+            Number(client.airline_charges) +
+            Number(client.crate_cost);
 
-        // 3. profit = quoted - total
-        client.profit = client.quoted_amount - client.total_cost;
-    });
+        client.profit = Number(client.quoted_amount) - client.total_cost;
+        client.balance_pending = Number(client.quoted_amount) - Number(client.advanced_received);
+    }
 
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
@@ -360,6 +359,9 @@
                 <div class="md:col-span-1">
                     <h2 class="text-xl font-semibold">Financials & Remarks</h2>
                     <p class="text-sm opacity-60">Invoicing details and custom notes.</p>
+                    <button type="button" class="mt-4 btn btn-info btn-outline btn-sm" onclick={runCalculations}>
+                        Auto Calculate
+                    </button>
                 </div>
                 <div class="border-t-4 shadow-xl md:col-span-2 card bg-base-100 border-info">
                     <div class="card-body">
@@ -376,6 +378,9 @@
                                             step="0.01"
                                             bind:value={client[money.id]}
                                             class="w-full input input-bordered pl-7"
+                                            class:bg-cyan-900={money.id.startsWith("total") ||
+                                                money.id.startsWith("balance") ||
+                                                money.id.startsWith("profit")}
                                         />
                                     </div>
                                 </label>
