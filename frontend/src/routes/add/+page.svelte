@@ -51,14 +51,15 @@
         // formulas:
         // 1. balance = quoted - advanced
         client.balance_pending = client.quoted_amount - client.advanced_received;
-        // 2. total_cost = quoted - (import_fee + export_fee + after_hr + forwarded + airline_charges + crate_cost)
+        // 2. total_cost = import_fee + export_fee + after_hr + forwarded + airline_charges + crate_cost
         client.total_cost =
-            client.quoted_amount -
-            (client.import_fee +
-                client.export_fee +
-                client.after_hours_charges +
-                client.airline_charges +
-                client.crate_cost);
+            client.import_fee +
+            client.export_fee +
+            client.forwarder_charges +
+            client.after_hours_charges +
+            client.airline_charges +
+            client.crate_cost;
+
         // 3. profit = quoted - total
         client.profit = client.quoted_amount - client.total_cost;
     });
